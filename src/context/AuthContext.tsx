@@ -1,60 +1,66 @@
-import { createContext, useContext, useState, ReactNode, useEffect, useRef } from 'react';
+import { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
 import { useLogin, useSignUp, useRefreshToken, useRevokeToken } from '../services/Authentication/AuthenticationService';
 import { useNavigate } from 'react-router-dom';
 import { ApolloError } from '@apollo/client';
-import { set } from 'react-hook-form';
 import { setAuthCallbacks } from '@/utils/ApolloClient';
-
-interface User {
-    userId: number
-    firstName: string
-    lastName: string
-    username: string 
-    email: string
-    location: string | null 
-    telephone: string | null
-    professionalHeadline: string | null 
-    summary: string | null 
-    since: string | null
-    countryId: number | null 
-    city: string | null
-    avatar: string | null
-}
-
-interface AuthContextType {
-    isAuthenticated: boolean;
-    signup: (firstName: string, lastName: string, email: string, username: string, password: string) => Promise<void>;
-    login: (username: string, password: string, rememberMe: boolean) => Promise<void>;
-    logout: () => void;
-    updateUser: (newUser: User) => void;
-    token: string | null;
-    user: User | null;
-    loading: boolean;
-    error: null | ApolloError;
-    clearError: () => void;
-}
+import { User } from '@/custom/interfaces/general/GeneralInterfaces';
+import { AuthContextType } from '@/custom/interfaces/Context/AuthContextInterfaces';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
+    // 1. Estados
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-    const [user, setUser] = useState<User | null>(null);
+    const [user, setUser] = useState<User | undefined>(undefined);
     const [accessToken, setAccessToken] = useState<string | null>(null);
     const [refreshToken, setRefreshToken] = useState<string | null>(localStorage.getItem('refreshToken'));
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState<boolean>(true);
     const [errorMessage, setErrorMessage] = useState<null | ApolloError>(null);
-    const { signUp: SignUp, data: singUpData, error: signUpError } = useSignUp();
+
+    // 2. Hooks y Referencias
+    const { signUp: SignUp, error: signUpError } = useSignUp();
     const { login: loginUser, data: signInData, error: signInError} = useLogin();
     const { refreshToken: refreshTokenProcess } = useRefreshToken();
     const { revokeToken: RevokeToken, data: revokeTokenData } = useRevokeToken();
-    const didMountRef = useRef(false);
     const navigate = useNavigate();
 
-    const getAccessTokenRef = useRef(() => accessToken);
-    const getRefreshTokenRef = useRef(() => refreshToken);
-    const performLogoutRef = useRef(() => logout());
+    // --- 3. Funciones (useCallback) ---
+    const clearError = useCallback(() => {
+        setErrorMessage(null)
+    }, []);
 
-    const callRefreshTokenRef = useRef(async (token: string) => {
+    const finishLoading = useCallback(() => {
+        setTimeout(() => {
+            setLoading(false);
+        }, 0);
+    }, []);
+
+    const logout = useCallback(async (token = refreshToken) => {
+        if(token){
+            try {
+                setLoading(true)
+                navigate('/signin');
+                
+                localStorage.removeItem("user");
+                localStorage.removeItem("refreshToken");
+                
+                setUser(undefined);
+                setAccessToken(null);
+                setRefreshToken(null);
+                setIsAuthenticated(false);
+
+                await RevokeToken(token);
+            } catch (error) {
+                console.error("Sign In Error:", error);
+            }finally{
+                finishLoading();
+            }
+        }else{
+            finishLoading();
+        }
+    }, [refreshToken]);
+
+    const callRefreshTokenProcess = useCallback(async (token: string) => {
         try {
             const { data } = await refreshTokenProcess(token);
             if (data && data.refreshToken) {
@@ -68,86 +74,60 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             console.error("Error al refrescar el token:", err);
             throw err;
         }
-    });
+    }, []);
 
-    const logout = async (token = refreshToken) => {
-        if(token){
-            try {
-                setLoading(true)
-                navigate('/signin');
-                
-                localStorage.removeItem("user");
-                localStorage.removeItem("refreshToken");
-                
-                setUser(null);
-                setAccessToken(null);
-                setRefreshToken(null);
-                setIsAuthenticated(false);
-
-                await RevokeToken(token);
-            } catch (error) {
-                console.error("Sign In Error:", error);
+    const tryRefreshOnLoad = useCallback(async (storedRefreshToken: string, storedUser: string) => {
+        setLoading(true)
+        try {
+            const newTokens = await callRefreshTokenProcess(storedRefreshToken);
+            if (newTokens) {
+                setAccessToken(newTokens.accessToken);
+                setUser(JSON.parse(storedUser));
+                setIsAuthenticated(true);
+                finishLoading();
+            } else {
+                logout(storedRefreshToken);
             }
+        } catch (err) {
+            logout(storedRefreshToken);
         }
-    };
+    }, []);
 
     useEffect(() => {
-        if(revokeTokenData?.revokeToken){
+        if(revokeTokenData){
             setLoading(false)
         }
     }, [revokeTokenData])
 
-    useEffect(() => {
-        getAccessTokenRef.current = () => accessToken;
-        getRefreshTokenRef.current = () => refreshToken;
-        performLogoutRef.current = () => logout();
+    // --- 4. Lógica de Sincronización con Apollo ---
 
+    useEffect(() => {
         setAuthCallbacks(
-            getAccessTokenRef.current,
-            getRefreshTokenRef.current,
-            callRefreshTokenRef.current,
-            performLogoutRef.current
+            () => accessToken,
+            () => refreshToken,
+            callRefreshTokenProcess,
+            logout
         );
-    }, [accessToken, refreshToken, logout, callRefreshTokenRef]);
+    }, [accessToken, refreshToken, logout, callRefreshTokenProcess]);
 
-    useEffect(() => {
-        if (didMountRef.current) {
-            return;
-        }
-        didMountRef.current = true;
+    // --- 5. Lógica de Carga Inicial ---
 
-        getAccessTokenRef.current = () => accessToken;
-        getRefreshTokenRef.current = () => refreshToken;
-        performLogoutRef.current = () => logout();
-
+    useEffect(() =>{
         const storedUser = localStorage.getItem("user");
         const storedRefreshToken = localStorage.getItem("refreshToken");
 
         if (storedUser && storedRefreshToken) {
-            const tryRefreshOnLoad = async () => {
-                try {
-                    if (!hasRememberMe(storedRefreshToken) || isTokenExpired(storedRefreshToken)) {
-                        logout(storedRefreshToken);
-                    } else {
-                        const newTokens = await callRefreshTokenRef.current(storedRefreshToken);
-                        if (newTokens) {
-                            setAccessToken(newTokens.accessToken);
-                            setUser(JSON.parse(storedUser));
-                            setIsAuthenticated(true);
-                            setLoading(false)
-                        } else {
-                            logout(storedRefreshToken);
-                        }
-                    }
-                } catch (err) {
-                    logout(storedRefreshToken);
-                }
-            };
-            tryRefreshOnLoad();
-        } else {
-            setLoading(false);
+            if(isTokenExpired(storedRefreshToken)){
+                logout(storedRefreshToken);
+            } else {
+                tryRefreshOnLoad(storedRefreshToken, storedUser);   
+            }
+        }else{
+            finishLoading();
         }
-    }, []); 
+    }, []);
+
+    // --- 6. Manejadores de Respuesta de Mutaciones (Login/SignUp) ---
 
     useEffect(() => {
         if (signInData && signInData.login) {
@@ -169,13 +149,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }, [signInData]);
 
     useEffect(() => {
-        if (singUpData && singUpData.registerUser) {
-            navigate('/signin');
-            setIsAuthenticated(true)
-        }
-    }, [singUpData]);
-
-    useEffect(() => {
         if (signUpError) {
             setErrorMessage(signUpError);
         }
@@ -187,7 +160,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
     }, [signInError]);
 
-    const login = async (username: string, password: string, rememberMe: boolean) => {
+    // --- 7. Funciones Públicas ---
+
+    const login = useCallback(async (username: string, password: string, rememberMe: boolean) => {
         try {
             clearError()
             setLoading(true);
@@ -195,33 +170,48 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         } catch (error) {
             console.error("Sign In Error:", error);
         } finally {          
-            setLoading(false);
+            finishLoading();
         }
-    };
+    }, []);
 
-    const signup = async (firstName: string, lastName: string, email: string, username: string, password: string) => {
+    const signup = useCallback(async (firstName: string, lastName: string, email: string, username: string, password: string) => {
         try {
             clearError()
             setLoading(true);
-            await SignUp(firstName, lastName, email, username, password);
+            
+            const response = await SignUp(firstName, lastName, email, username, password);
+            if(response?.data){
+                navigate("/SignIn");
+            }
         } catch (error) {
             console.error("Sign Up Error:", error);
         } finally {          
-            setLoading(false);
+            finishLoading();
         }
-    };
+    }, []);
 
-    const updateUser = (newUser: User) => {
+    const updateUser = useCallback((newUser: User) => {
         localStorage.setItem('user', JSON.stringify(newUser));
         setUser(newUser);
-    };
+    }, []);
 
-    const clearError = () => {
-        setErrorMessage(null)
-    }
+    // --- 8. Renderizado del Contexto ---
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, signup, login, logout, token: accessToken, user, loading, error: errorMessage, clearError, updateUser }}>
+        <AuthContext.Provider 
+            value={{ 
+                isAuthenticated, 
+                signup, 
+                login, 
+                logout, 
+                token: accessToken, 
+                user, 
+                loading, 
+                error: errorMessage, 
+                clearError, 
+                updateUser 
+            }}
+        >
             {children}
         </AuthContext.Provider>
     );

@@ -1,4 +1,5 @@
-import { ApolloError, useLazyQuery } from '@apollo/client';
+import { CombinedGraphQLErrors } from '@apollo/client/errors';
+import { useLazyQuery } from "@apollo/client/react";
 import { GET_CATEGORIES } from '@/graphql/Category/CategoryQueries';
 
 export const useGetCategory = () => {
@@ -8,7 +9,7 @@ export const useGetCategory = () => {
         try {
             await getCategories();
         } catch (err) {
-            if (err instanceof ApolloError) {
+            if (err instanceof CombinedGraphQLErrors) {
                 console.error(err.message);
             }
         }

@@ -1,18 +1,17 @@
-import { ApolloError, useMutation, useLazyQuery } from '@apollo/client';
+import { CombinedGraphQLErrors } from '@apollo/client';
+import { useMutation, useLazyQuery } from '@apollo/client/react';
 import { GET_USER_SOCIAL_MEDIA } from '@/graphql/UserSocialNetwork/UserSocialNetworkQueries';
 import { REMOVE_USER_NETWORK, STORE_USER_NETWORK, UPDATE_USER_NETWORK } from '@/graphql/UserSocialNetwork/UserSocialNetworkMutations';
+import { UserVariablesInterface } from '@/graphql/User/UserInterfaces';
+import { GetUserSocialMedia } from '@/custom/interfaces/ProfileSettings/ProfileSocialMedia';
 
 export const useGetUserSocialMedia = () => {
-    const [getUserSocialMedia, { data, loading, error }] = useLazyQuery(GET_USER_SOCIAL_MEDIA);
+    const [execute, { data, loading, error }] = useLazyQuery<GetUserSocialMedia>(GET_USER_SOCIAL_MEDIA);
 
-    const GetUserSocialMedia = async () => {
-        try {
-            await getUserSocialMedia();
-        } catch (err) {
-            if (err instanceof ApolloError) {
-                console.error(err.message);
-            }
-        }
+    const GetUserSocialMedia = async (data: UserVariablesInterface) => {
+        return execute({
+            variables: { data }
+        });
     };
 
     return {
@@ -31,11 +30,11 @@ export const useStoreUserSocialNetowrk= () => {
     const storeUserNetwork = async (socialMediaId: number, link: string) => {
         try {
             const storeUserNetwork = { socialMediaId, link };
-            await socialNetowrkMutation({ 
+            return await socialNetowrkMutation({ 
                 variables: { storeUserNetwork }
             });
         } catch (err) {
-            if (err instanceof ApolloError) {
+            if (err instanceof CombinedGraphQLErrors) {
                 console.error(err.message);
             }
         }
@@ -57,11 +56,11 @@ export const useUpdateUserSocialNetowrk= () => {
     const updateUserNetwork = async (userSocialNetworkId: number, socialMediaId: number, link: string) => {
         try {
             const updateUserNetwork = { userSocialNetworkId, socialMediaId, link };
-            await updateSocialNetowrkMutation({ 
+            return await updateSocialNetowrkMutation({ 
                 variables: { updateUserNetwork }
             });
         } catch (err) {
-            if (err instanceof ApolloError) {
+            if (err instanceof CombinedGraphQLErrors) {
                 console.error(err.message);
             }
         }
@@ -82,11 +81,11 @@ export const useRemoveUserSocialNetowrk= () => {
 
     const removeUserNetwork = async (userSocialNetworkId: number) => {
         try {
-            await removeUserNetowrkMutation({ 
+            return await removeUserNetowrkMutation({ 
                 variables: { userSocialNetworkId }
             });
         } catch (err) {
-            if (err instanceof ApolloError) {
+            if (err instanceof CombinedGraphQLErrors) {
                 console.error(err.message);
             }
         }

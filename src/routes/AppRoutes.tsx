@@ -4,10 +4,8 @@ import ArtworkView from '@/screens/Artwork/ArtworkView';
 import SignIn from '@/screens/Authentication/SignIn';
 import SignUp from '@/screens/Authentication/SignUp';
 //import Favorites from './pages/User/Favorites';
-import PrivateRoute from '../utils/PrivateRoute';
 import MainLayout from '@/screens/Layouts/MainLayout';
 import AuthLayout from '@/screens/Layouts/AuthLayout';
-import LoadingScreen from '@/custom/Templates/LoadingScreen';
 import NotFoundPage from '@/screens/Layouts/NotFound';
 import RedirectToNotFound from '@/utils/RedirectToNotFound';
 import Profile from '@/screens/User/Profile';
@@ -15,7 +13,8 @@ import ProfileSettings from '@/screens/User/ProfileSettings';
 import ArtworkStore from '@/screens/Artwork/NewArtwork';
 import ArtworkEdit from '@/screens/Artwork/ArtworkEdit';
 import Viewer from '@/screens/Artwork/Viewer';
-import OwnerRoute from '@/utils/OwnerRoute';
+import PrivateRoute from '@/utils/PrivateRoute';
+import Chat from '@/screens/Chat/Chat';
 
 const AppRoutes = () => {
     return (
@@ -30,16 +29,13 @@ const AppRoutes = () => {
             {/* Rutas protegidas */}
             <Route element={<PrivateRoute />}>
                 <Route element={<MainLayout />}>
-                    <Route path="/Profile/:username" element={<Profile />} />
-                    <Route path="/Artworks/New" element={<ArtworkStore />} />
-                    {/*<Route path="/favorites" element={<Favorites />} />*/}
-                </Route>
-            </Route>
+                    <Route path="/Profile/:value/:module" element={<Profile />} />
+                    <Route path="/ProfileSettings/:value/:module" element={<ProfileSettings />} />
+                    {/* <Route path="/Favorites/:value/:module" element={<Favorites />} /> */}
+                    <Route path="/Chats/:value/:module" element={<Chat />} />
 
-            <Route element={<OwnerRoute />}>
-                <Route element={<MainLayout />}>
-                    <Route path="/ProfileSettings/:username" element={<ProfileSettings />} />
-                    <Route path="/Artworks/:title/:artworkId/Edit" element={<ArtworkEdit />} />
+                    <Route path="/Artworks/New/:value/:module" element={<ArtworkStore />} />
+                    <Route path="/Artworks/:title/:artworkId/:module/Edit" element={<ArtworkEdit />} />
                 </Route>
             </Route>
 
@@ -49,7 +45,6 @@ const AppRoutes = () => {
                 <Route path="/SignUp" element={<SignUp />} />
             </Route>
 
-            <Route path="/Loading" element={<LoadingScreen />} />
             <Route path="/NotFound" element={<NotFoundPage />} />
             <Route path="*" element={<RedirectToNotFound />} />
         </Routes>

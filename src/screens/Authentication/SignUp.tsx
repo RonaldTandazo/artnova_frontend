@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BsPersonFillAdd } from "react-icons/bs";
 import { useColorMode } from "@/components/ui/color-mode";
-import NotificationAlert from "@/custom/Components/NotificationAlert";
+import NotificationAlert from "@/custom/Components/States/NotificationAlert";
 
 interface FormValues {
     firstName: string;
@@ -138,7 +138,7 @@ const SignUp = () => {
                 <Card.Footer alignSelf={"center"}>
                     <Stack align="center">
                         <Card.Description>Already have an account?</Card.Description>
-                        <Button color={"white"} bg={colorMode === "light" ? "blackAlpha.800":""} onClick={() => navigate("/signin")} size={"xs"}>
+                        <Button color={"white"} bg={colorMode === "light" ? "blackAlpha.800":""} onClick={() => navigate("/SignIn")} size={"xs"}>
                             Sign In Here
                         </Button>
                     </Stack>

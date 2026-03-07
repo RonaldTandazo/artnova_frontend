@@ -1,4 +1,5 @@
-import { ApolloError, useLazyQuery } from '@apollo/client';
+import { CombinedGraphQLErrors } from '@apollo/client/errors';
+import { useLazyQuery } from "@apollo/client/react";
 import { GET_TOPICS } from '@/graphql/Topic/TopicQueries';
 
 export const useGetTopic = () => {
@@ -8,7 +9,7 @@ export const useGetTopic = () => {
         try {
             await getTopics();
         } catch (err) {
-            if (err instanceof ApolloError) {
+            if (err instanceof CombinedGraphQLErrors) {
                 console.error(err.message);
             }
         }

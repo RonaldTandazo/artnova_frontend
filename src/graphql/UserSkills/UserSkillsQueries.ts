@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client';
+import { gql } from '@apollo/client/core';
 
 export const GET_SKILLS_DATA = gql`    
     query GetSkillsData{ 
@@ -25,17 +25,17 @@ export const GET_USER_SKILLS = gql`
             userCategories{
                 userId
                 categoryId
-                category
+                name
             }
             userTopics{
                 userId
                 topicId
-                topic
+                name
             }
             userSoftwares{
                 userId
                 softwareId
-                software
+                name
             }
         }
     }

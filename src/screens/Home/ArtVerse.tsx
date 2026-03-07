@@ -1,36 +1,22 @@
 import { Box, Show } from '@chakra-ui/react';
-import ArtVerseGrid from '@/custom/Components/ArtVerseGrid';
-import { useEffect, useState } from 'react';
-import { useGetArtVerseArtworks } from '@/services/Artwork/ArtworkService';
-import LoadingProgress from '@/custom/Components/LoadingProgress';
+import ArtVerseGrid from '@/custom/Components/ArtVerse/ArtVerseGrid';
+import { useGlobalState } from '@/context/GlobalContext';
+import LoadingProgress from '@/custom/Components/States/LoadingProgress';
 
 const ArtVerse = () => {
-  const [artworks, setArtworks] = useState([]);
-
-  const { getArtVerseArtworks, data: artVerseArtworksData, loading: artVerseArtworksLoading } = useGetArtVerseArtworks();
-
-  useEffect(() => {
-    getArtVerseArtworks();
-  }, []);
-
-  useEffect(() => {
-    if (artVerseArtworksData?.getArtVerseArtworks) {
-      console.log(artVerseArtworksData?.getArtVerseArtworks)
-      setArtworks(artVerseArtworksData.getArtVerseArtworks)
-    }
-  }, [artVerseArtworksData]);
+  const { loading } = useGlobalState();
 
   return (
-    <Show
-      when={!artVerseArtworksLoading}
-      fallback={
+    <>
+      <Show 
+        when={loading}
+      >
         <LoadingProgress />
-      }
-    >
+      </Show>
       <Box>
-        <ArtVerseGrid artworks={artworks}/>
+        <ArtVerseGrid />
       </Box>
-    </Show>
+    </>
   );
 };
 

@@ -1,61 +1,29 @@
 import { useColorMode } from "@/components/ui/color-mode";
 import { useAuth } from "@/context/AuthContext";
-import LoadingProgress from "@/custom/Components/LoadingProgress";
-import SearchableSelect from "@/custom/Components/SearchableSelect";
-import { Box, Breadcrumb, Button, Card, Checkbox, CheckboxCard, CloseButton, Dialog, Drawer, Field, FileUpload, Flex, For, Grid, GridItem, Heading, Icon, IconButton, Image, Input, Popover, Portal, Show, Spinner, Stack, Tabs, Text, Textarea } from "@chakra-ui/react";
-import { ChangeEvent, ChangeEventHandler, useEffect, useRef, useState } from "react";
+import LoadingProgress from "@/custom/Components/States/LoadingProgress";
+import SearchableSelect from "@/custom/Components/Searchable/SearchableSelect";
+import { Box, Breadcrumb, Button, Card, Checkbox, CheckboxCard, Field, FileUpload, Flex, For, Grid, GridItem, Heading, Icon, IconButton, Image, Input, Show, Spacer, Spinner, Stack, Tabs, Text, Textarea } from "@chakra-ui/react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { FaArchive, FaCheckCircle } from "react-icons/fa";
+import { FaArchive } from "react-icons/fa";
 import { LuUpload } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
-import ReactCrop, { centerCrop, Crop, makeAspectCrop, PixelCrop } from 'react-image-crop'
 import 'react-image-crop/dist/ReactCrop.css'
-import { getCroppedImg } from "@/utils/CanvasCrop";
 import { GrPowerReset } from "react-icons/gr";
 import { FaCropSimple, FaNewspaper } from "react-icons/fa6";
-import { Md3dRotation, MdCancel, MdSlowMotionVideo } from "react-icons/md";
-import NotificationAlert from "@/custom/Components/NotificationAlert";
-import SearchableInput from "@/custom/Components/SearchableInput";
+import { Md3dRotation, MdSlowMotionVideo } from "react-icons/md";
+import NotificationAlert from "@/custom/Components/States/NotificationAlert";
+import SearchableInput from "@/custom/Components/Searchable/SearchableInput";
 import { useGetArtworkFormData, useStoreArtwork } from "@/services/Artwork/ArtworkService";
 import { IoMdImages } from "react-icons/io";
-import MultimediaCollector from "@/custom/Components/MultimediaCollector";
+import MultimediaCollector from "@/custom/Components/Artwork/MultimediaCollector";
 import { RiCalendarScheduleFill } from "react-icons/ri";
-import { DayPicker } from "react-day-picker";
-import "react-day-picker/style.css";
-
-interface ArtWorkForm {
-    status: number;
-}
-
-interface CategoryOption {
-    value: number;
-    label: string;
-}
-
-interface PublishingOptions {
-    value: number;
-    label: string;
-}
-
-interface SoftwareOptions {
-    value: number;
-    label: string;
-}
-
-interface TopicOptions {
-    value: number;
-    label: string;
-}
-
-interface FileInterface {
-    originalFile: string | undefined;
-    crop: string | undefined;
-}
-
-interface MultimediaFiles {
-    type: string;
-    files: FileInterface[];
-}
+import MultimediaDialog from "@/custom/Components/Dialogs/MultimediaDialog";
+import { convertBase64ToFile, encodeToBase64 } from "@/utils/Helpers";
+import { SelectOptions } from "@/custom/interfaces/general/GeneralInterfaces";
+import { ArtWorkForm, FileInterface, MultimediaFiles } from "@/custom/interfaces/NewArtwork/NewArtwork";
+import ScheduleDrawer from "@/custom/Components/Artwork/NewArtwork/ScheduleDrawer";
+import { DateValue, Time } from "@internationalized/date";
 
 const NewArtwork = () => {
     const { storeArtwork: StoreArtwork, data: storeArtworkData, loading: storeArtworkLoading, error: storeArtworkError } = useStoreArtwork();
@@ -65,38 +33,28 @@ const NewArtwork = () => {
     const { user } = useAuth();
     const { colorMode } = useColorMode();
 
-    const [categories, setCategories] = useState<CategoryOption[]>([]);
-    const [topics, setTopics] = useState<TopicOptions[]>([]);
-    const [softwares, setSoftwares] = useState<SoftwareOptions[]>([]);
-    const [publishing, setPublishing] = useState<PublishingOptions[]>([]);
-    const [draft, setDraft] = useState<PublishingOptions | undefined>(undefined);
-    const [schedule, setSchedule] = useState<PublishingOptions | undefined>(undefined);
+    const [categories, setCategories] = useState<SelectOptions[]>([]);
+    const [topics, setTopics] = useState<SelectOptions[]>([]);
+    const [softwares, setSoftwares] = useState<SelectOptions[]>([]);
+    const [publishing, setPublishing] = useState<SelectOptions[]>([]);
+    const [draft, setDraft] = useState<SelectOptions | undefined>(undefined);
+    const [schedule, setSchedule] = useState<SelectOptions | undefined>(undefined);
     
     const [title, setTitle] = useState<string>('ArtWork');
     const [description, setDescription] = useState<string | undefined>(undefined);
     const [matureContent, setMatureContent] = useState<boolean>(false);
     const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
-    const [selectedTopic, setSelectedTopic] = useState<TopicOptions[]>([]);
-    const [selectedSoftware, setSelectedSoftware] = useState<SoftwareOptions[]>([]);
-    const [scheduleDate, setScheduleDate] = useState<Date | undefined>(undefined);
-    const [scheduleTime, setScheduleTime] = useState<string | undefined>(undefined);
-    const formattedDate = scheduleDate ? scheduleDate.toLocaleDateString() : 'Set Date';
-    
+    const [selectedTopic, setSelectedTopic] = useState<SelectOptions[]>([]);
+    const [selectedSoftware, setSelectedSoftware] = useState<SelectOptions[]>([]);
+
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-    const [crop, setCrop] = useState<Crop>()
-    const [completedCrop, setCompletedCrop] = useState<PixelCrop | null>(null)
-    const [imgURL, setImgURL] = useState<string | undefined>(undefined)
-    const [preview, setPreview] = useState<string | undefined>(undefined);
-    const [aspect, setAspect] = useState<number | undefined>(1 / 1)
-    const [scale, setScale] = useState<number>(1)
-    const [rotate, setRotate] = useState<number>(0)
-    const imgRef = useRef<HTMLImageElement>(null)
+    const [fileURL, setFileURL] = useState<string | undefined>(undefined)
+    const [preview, setPreview] = useState<FileInterface | undefined>(undefined);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [error, setError] = useState<string | undefined>(undefined);
     const [activeTab, setActiveTab] = useState<string | null>("1");
     const [multimedia, setMultimedia] = useState<MultimediaFiles[]>([]);
     const [openDrawer, setOpenDrawer] = useState<boolean>(false)
-    const [isOpenDatePicker, setIsOpenDatePicker] = useState<boolean>(false)
 
     const {
         handleSubmit,
@@ -113,52 +71,35 @@ const NewArtwork = () => {
         if (formDataData && formDataData.getArtworkFormData) {
             const { categories, publishing, softwares, topics } = formDataData.getArtworkFormData;
 
-            const formattedCategories: CategoryOption[] = categories.map((category: any) => ({
+            setCategories(categories.map(category => ({
                 value: category.categoryId,
-                label: category.name,
-            }));
+                label: category.name
+            })));
 
-            setCategories(formattedCategories);
-
-            const formattedPublishing: PublishingOptions[] = publishing.filter((item: any) => item.type == 'select')
-            .map((state: any) => ({
-                value: state.publishingId,
-                label: state.name,
-            }));
-
-            setPublishing(formattedPublishing);
-
-            const foundDraft = publishing.find((item: any) => item.type === 'draft');
-            setDraft(
-                foundDraft ? { 
-                    label: foundDraft.name,
-                    value: foundDraft.publishingId
-                }
-                : undefined
-            )
-
-            const foundSchedule = publishing.find((item: any) => item.type === 'schedule');
-            setSchedule(
-                foundSchedule ? { 
-                    label: foundSchedule.name,
-                    value: foundSchedule.publishingId
-                }
-                : undefined
-            )
-
-            const formattedSoftware: SoftwareOptions[] = softwares.map((software: any) => ({
+            setSoftwares(softwares.map(software => ({
                 value: software.softwareId,
                 label: software.name,
-            }));
+            })));
 
-            setSoftwares(formattedSoftware);
-
-            const formattedTopic: TopicOptions[] = topics.map((topic: any) => ({
+            setTopics(topics.map(topic => ({
                 value: topic.topicId,
                 label: topic.name,
-            }));
+            })));
 
-            setTopics(formattedTopic);
+            setPublishing(publishing.filter((item: any) => item.type == 'select')
+                .map(publish => ({
+                    value: publish.publishingId,
+                    label: publish.name
+                })
+            ));
+
+            const formatPublishing = (type: string) => {
+                const found = publishing.find((item) => item.type === type);
+                return found ? { label: found.name, value: found.publishingId } : undefined;
+            };
+
+            setDraft(formatPublishing('draft'));
+            setSchedule(formatPublishing('schedule'));
         }
     }, [formDataData]);
 
@@ -176,7 +117,10 @@ const NewArtwork = () => {
 
     const handleNavigate = () => {
         if(user){
-            navigate(`/Profile/${user.username}`)
+            const encodedUserId = encodeToBase64(user.userId);
+            const encodedModule = encodeToBase64('OwnProfile');
+                
+            navigate(`/Profile/${encodedUserId}/${encodedModule}`);
         }
     }
 
@@ -188,7 +132,7 @@ const NewArtwork = () => {
         }
     };
 
-    const handleSoftwareChange = (item: SoftwareOptions, action: string) => {
+    const handleSoftwareChange = (item: SelectOptions, action: string) => {
         if(action === "remove"){
             if (selectedSoftware.find((software) => item.value === software.value)) {
                 setSelectedSoftware(selectedSoftware.filter((software) => item.value !== software.value));
@@ -202,7 +146,7 @@ const NewArtwork = () => {
         }
     };
 
-    const handleTopicChange = (item: TopicOptions, action: string) => {
+    const handleTopicChange = (item: SelectOptions, action: string) => {
         if(action === "remove"){
             if (selectedTopic.find((topic) => item.value === topic.value)) {
                 setSelectedTopic(selectedTopic.filter((topic) => item.value !== topic.value));
@@ -240,71 +184,49 @@ const NewArtwork = () => {
         }
         
         handleError(undefined);
-        setCrop(undefined)
-        const reader = new FileReader();
-        reader.addEventListener("load", () => {
-            const imgURL = reader.result?.toString() || '';
-            setImgURL(imgURL)
-        })
 
-        reader.readAsDataURL(file)
-        setIsModalOpen(true)
-    };
-
-    function centerAspectCrop(
-        mediaWidth: number,
-        mediaHeight: number,
-        aspect: number,
-    ) {
-        return centerCrop(
-            makeAspectCrop(
-                {
-                    unit: '%',
-                    width: 90,
-                },
-                aspect,
-                mediaWidth,
-                mediaHeight,
-            ),
-            mediaWidth,
-            mediaHeight,
-        )
-    }
-
-    const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-        if(aspect){
-            const { width, height } = e.currentTarget    
-            setCrop(centerAspectCrop(width, height, aspect))
-        }
-    }
-
-    const onCropChange = (newCrop: Crop) => {
-        setCrop(newCrop);
-    };
-
-    const onComplete = async (crop:any) => {
-        setCompletedCrop(crop);
-        if (imgRef.current && completedCrop) {
-            const croppedImageUrl = getCroppedImg(imgRef.current, completedCrop, rotate, scale);
-            setPreview(croppedImageUrl);
-            setIsModalOpen(false);
+        if (file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = () => {
+                setFileURL(reader.result?.toString() || '');
+                setIsModalOpen(true);
+            };
+            reader.readAsDataURL(file);
         }
     };
 
-    const handleDateSelect = (date: Date) => {
-        console.log("date")
-        console.log(date)
-        setScheduleDate(date);
-        setIsOpenDatePicker(false);
+    const handleComplete = async (file: string) => {
+        const convertedFile = convertBase64ToFile(file, `cropped-image-${Date.now()}.jpg`);
+        const newFile: FileInterface = {
+            originalFile: fileURL,
+            crop: convertedFile,
+            display: file
+        }       
+        setPreview(newFile);
+        setIsModalOpen(false);
     };
 
-    const handleTimeChange: ChangeEventHandler<HTMLInputElement> = (e) => {
-        const time = e.target.value;
-        setScheduleTime(time);
+    const handleClose = () => {
+        setIsModalOpen(false);
+        setFileURL(undefined);
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
     };
+
+    const handleCrop = () => {
+        if(preview?.originalFile){
+            const imageURL = preview?.originalFile
+            if (typeof imageURL === 'string') {
+                setFileURL(imageURL);
+                setIsModalOpen(true);
+            }
+        }
+    }
 
     const structureData = async (type: string, data: any = null) => {
         handleError(undefined);
+
         const softwareIds = selectedSoftware.map(({ value }) => value);
         const topicIds = selectedTopic.map(({ value }) => value);
 
@@ -313,12 +235,12 @@ const NewArtwork = () => {
         const publishingTargetStatus = isSchedule ? data.status[0]:null;
 
         const images = multimediaMap['images']?.map((file: FileInterface) => file.crop) ?? [];
-        const videos = multimediaMap['videos'] ?? [];
+        const videos = multimediaMap['videos']?.map((file: FileInterface) => file.originalFile) ?? [];
         const file3d = multimediaMap['3d'] ?? '';
 
         const formData = {
-            title: title,
-            description: description,
+            title: title.trim(),
+            description: description ? description.trim():description,
             matureContent: matureContent,
             categories: selectedCategories,
             topics: topicIds,
@@ -326,15 +248,13 @@ const NewArtwork = () => {
             images: images,
             videos: videos,
             file3d: file3d,
-            thumbnail: preview,
+            thumbnail: preview?.crop,
             publishing: status,
             schedule: isSchedule,
             publishingTargetStatus: publishingTargetStatus,
-            scheduleDate: scheduleDate,
-            scheduleTime: scheduleTime
+            scheduleDate: data.scheduledDate,
+            scheduleTime: data.scheduledTime
         }
-
-        console.log(formData)
 
         return formData;
     }
@@ -344,19 +264,11 @@ const NewArtwork = () => {
         await StoreArtwork(storeData)
     });
 
-    const handleSchedulePost = handleSubmit(async (data: any) => {
-        if(!scheduleDate){
-            handleError('You must establish Date for scheduling')
-            return;
-        }
-
-        if(!scheduleTime){  
-            handleError('You must establish Time for scheduling')
-            return;
-        }
-        const storeData = await structureData('schedule', data)
-        //await StoreArtwork(storeData)
-    });
+    const handleSchedulePost = async (date: DateValue, time: Time) => {
+        const payload = { ...watch(), scheduledDate: date.toString(), scheduledTime: time.toString() };
+        const storeData = await structureData('schedule', payload);
+        await StoreArtwork(storeData)
+    };
 
     const handleSaveDraft = async () => {
         const storeData = await structureData('draft', null)
@@ -364,8 +276,7 @@ const NewArtwork = () => {
     };
 
     const resetThumbnail = () => {
-        setImgURL(undefined);
-        setCompletedCrop(null);
+        setFileURL(undefined);
         setPreview(undefined);
         handleError(undefined);
     }
@@ -393,16 +304,6 @@ const NewArtwork = () => {
     const handleError = (errorMessage: string | undefined) => {
         setError(errorMessage)
     }
-
-    const images = [
-        { type: 'image', url: 'https://tse1.mm.bing.net/th/id/OIP.Z0FlCPCvgwT_99_fQ8NeSgHaEJ?rs=1&pid=ImgDetMain&o=7&rm=3', caption: "El Test" },
-        { type: 'image', url: 'https://images.pexels.com/photos/2280549/pexels-photo-2280549.jpeg?cs=srgb&dl=pexels-chokniti-khongchum-1197604-2280549.jpg&fm=jpg', caption: "" },
-        { type: 'image', url: 'https://www.infoescola.com/wp-content/uploads/2010/06/tigre-de-bengala-60322900-1000x664.jpg', caption: "El tigre" },
-    ];
-
-    const videos = [
-        { type: 'video', url: 'https://www.tiktok.com/@rolitas_clow05/video/7506954742346681656?is_from_webapp=1&sender_device=pc' },
-    ];
 
     const multimediaMap = multimedia.reduce((acc: any, current: MultimediaFiles) => {
         acc[current.type] = current.files;
@@ -474,7 +375,13 @@ const NewArtwork = () => {
                     <Breadcrumb.Root size={"lg"}>
                         <Breadcrumb.List>
                             <Breadcrumb.Item>
-                                <Breadcrumb.Link onClick={handleNavigate} color={colorMode === "light" ? "cyan.600" : "pink.600"}>Profile</Breadcrumb.Link>
+                                <Breadcrumb.Link 
+                                    onClick={handleNavigate}
+                                    color={colorMode === "light" ? "cyan.600" : "pink.600"}
+                                    cursor={"pointer"}
+                                >
+                                    Profile
+                                </Breadcrumb.Link>
                             </Breadcrumb.Item>
                             <Breadcrumb.Separator />
                             <Breadcrumb.Item>
@@ -482,7 +389,7 @@ const NewArtwork = () => {
                             </Breadcrumb.Item>
                         </Breadcrumb.List>
                     </Breadcrumb.Root>
-                    <Heading my={10} size={"4xl"}>{title != '' ? title : 'ArtWork'}</Heading>
+                    <Heading my={10} size={"4xl"}>{title != '' ? title.trim() : 'ArtWork'}</Heading>
                     <form onSubmit={onSubmit}>
                         <Grid
                             templateColumns={"4fr 1fr"}
@@ -498,7 +405,7 @@ const NewArtwork = () => {
                                         </Box>
                                         <Stack mx={10} mt={5} mb={10}>
                                             <Field.Root>
-                                                <Input size={"lg"} placeholder="Name your ArtWork..." onChange={(e) => setTitle((e.target.value).trim())} />
+                                                <Input size={"lg"} placeholder="Name your ArtWork..." onChange={(e) => setTitle(e.target.value)} />
                                             </Field.Root>
                                         </Stack>
                                     </Box>
@@ -509,7 +416,7 @@ const NewArtwork = () => {
                                         <Stack mx={10} mt={5} mb={10} gap={10}>
                                             <Field.Root>
                                                 <Field.Label fontSize={"lg"}>Description</Field.Label>
-                                                <Textarea resize="both" size={"lg"} placeholder="Describe your ArtWork..." onChange={(e) => setDescription((e.target.value).trim())} />
+                                                <Textarea resize="both" size={"lg"} placeholder="Describe your ArtWork..." onChange={(e) => setDescription(e.target.value)} />
                                             </Field.Root>
                                             <Field.Root>
                                                 <Field.Label fontSize={"lg"}>Mature Content</Field.Label>
@@ -549,8 +456,8 @@ const NewArtwork = () => {
                                                                 key={item.value}
                                                                 variant={"outline"}
                                                                 colorPalette={colorMode === "light" ? "cyan" : "pink"}
-                                                                onCheckedChange={() => handleCategoryChange(item.value)}
-                                                                checked={selectedCategories.includes(item.value)}
+                                                                onCheckedChange={() => handleCategoryChange(Number(item.value))}
+                                                                checked={selectedCategories.includes(Number(item.value))}
                                                                 cursor="pointer"
                                                             >
                                                                 <CheckboxCard.HiddenInput />
@@ -719,14 +626,14 @@ const NewArtwork = () => {
                                                                 key={tab.index}
                                                                 value={tab.index}
                                                                 inset="0"
-                                                                _open={{
-                                                                    animationName: "fade-in, scale-in",
-                                                                    animationDuration: "300ms",
-                                                                }}
-                                                                _closed={{
-                                                                    animationName: "fade-out, scale-out",
-                                                                    animationDuration: "120ms",
-                                                                }}
+                                                                // _open={{
+                                                                //     animationName: "fade-in, scale-in",
+                                                                //     animationDuration: "300ms",
+                                                                // }}
+                                                                // _closed={{
+                                                                //     animationName: "fade-out, scale-out",
+                                                                //     animationDuration: "120ms",
+                                                                // }}
                                                             >
                                                                 {tab.content}
                                                             </Tabs.Content>
@@ -758,13 +665,12 @@ const NewArtwork = () => {
                                                                 <Box color="fg.muted">.png, .jpg, .gif, .webp up to 5MB</Box>
                                                             </FileUpload.DropzoneContent>
                                                         </FileUpload.Dropzone>
-                                                        <FileUpload.List />
                                                     </FileUpload.Root>
                                                 </Show>
-                                                <Show when={preview}>
+                                                <Show when={preview && preview.display}>
                                                     <Box w="full" h="full" display={"flex"} justifyContent={"center"}  alignItems={"center"}>
                                                         <Image 
-                                                            src={preview} 
+                                                            src={preview?.display} 
                                                             alt="Image Preview" 
                                                             w="full" 
                                                             h="full" 
@@ -785,7 +691,8 @@ const NewArtwork = () => {
                                                         <Button
                                                             bg={colorMode === "light" ? "cyan.600":"pink.600"}
                                                             color={"whiteAlpha.950"}
-                                                            >
+                                                            onClick={handleCrop}
+                                                        >
                                                             <FaCropSimple /> Crop
                                                         </Button>
                                                         <Button 
@@ -799,59 +706,6 @@ const NewArtwork = () => {
                                                 </Show>
                                             </Field.Root>
                                         </Stack>
-
-                                        <Dialog.Root open={isModalOpen} size={"md"}>
-                                            <Portal>
-                                                <Dialog.Backdrop />
-                                                <Dialog.Positioner>
-                                                    <Dialog.Content>
-                                                        <Dialog.Header bg={colorMode === "light" ? "cyan.600":"blackAlpha.500"}>
-                                                            <Dialog.Title>Crop Image</Dialog.Title>
-                                                        </Dialog.Header>
-                                                        <Dialog.Body w={"full"} h={"full"} display={"flex"} justifyContent={"center"} alignItems={"center"}>
-                                                            <ReactCrop
-                                                                crop={crop}
-                                                                aspect={aspect}
-                                                                minHeight={100}
-                                                                onChange={onCropChange}
-                                                                onComplete={(c) => setCompletedCrop(c)}
-                                                                keepSelection
-                                                            >
-                                                                <Show when={imgURL}>
-                                                                    <Image
-                                                                        ref={imgRef}
-                                                                        alt="Image Crop"
-                                                                        src={imgURL}
-                                                                        style={{ transform: `scale(${scale}) rotate(${rotate}deg)` }}
-                                                                        onLoad={onImageLoad}
-                                                                    />
-                                                                </Show>
-                                                            </ReactCrop>
-                                                        </Dialog.Body>
-                                                        <Dialog.Footer>
-                                                            <Dialog.ActionTrigger asChild>
-                                                                <Button 
-                                                                    bg={colorMode === "light" ? "cyan.600":"pink.600"}
-                                                                    color={"whiteAlpha.950"}
-                                                                    onClick={() => {
-                                                                        setIsModalOpen(false)
-                                                                    }}
-                                                                >
-                                                                    <MdCancel /> Cancel
-                                                                </Button>
-                                                            </Dialog.ActionTrigger>
-                                                            <Button 
-                                                                bg={colorMode === "light" ? "cyan.600":"pink.600"}
-                                                                color={"whiteAlpha.950"}
-                                                                onClick={onComplete}
-                                                            >
-                                                                <FaCheckCircle /> Confirm
-                                                            </Button>
-                                                        </Dialog.Footer>
-                                                    </Dialog.Content>
-                                                </Dialog.Positioner>
-                                            </Portal>
-                                        </Dialog.Root>
                                     </Box>
                                     <Box border={"solid 1px"} w={"full"} borderRadius={"md"} borderColor={colorMode === "light" ? "cyan.600" : "whiteAlpha.300"} shadow={"lg"}>
                                         <Box w={"full"} bg={colorMode === "light" ? "cyan.600" : "blackAlpha.500"} py={5} px={10} borderTopRadius={"sm"}>
@@ -872,114 +726,24 @@ const NewArtwork = () => {
                                                     <Field.ErrorText>{errors.status?.message}</Field.ErrorText>
                                                 </Field.Root>
                                             </Show>
-                                            <Box display={"flex"} justifyContent={watch('status') ? "space-between":"flex-end"} mt={3}>
+                                            <Box display={"flex"} mt={3}>
                                                 <Show when={publishing.length > 0 && watch('status')}>
                                                     <Show
                                                         when={schedule}
                                                     >
-                                                        <Drawer.Root open={openDrawer} onOpenChange={(e) => setOpenDrawer(e.open)} placement={"start"} size={"sm"}>
-                                                            <Drawer.Trigger asChild>
-                                                                <Button 
-                                                                    variant="outline" 
-                                                                    size="sm"
-                                                                    bg={colorMode === "light" ? "cyan.600":"pink.600"}
-                                                                    color={"whiteAlpha.950"}
-                                                                    maxW={"45%"}
-                                                                >
-                                                                    <RiCalendarScheduleFill />
-                                                                    {schedule?.label}
-                                                                </Button>
-                                                            </Drawer.Trigger>
-                                                            <Portal>
-                                                                <Drawer.Backdrop />
-                                                                <Drawer.Positioner>
-                                                                    <Drawer.Content>
-                                                                        <Drawer.Header>
-                                                                            <Drawer.Title color={colorMode == 'light' ? 'black':'white'}>Schedule Post</Drawer.Title>
-                                                                        </Drawer.Header>
-                                                                        <Drawer.Body>
-                                                                            <Text color={colorMode == 'light' ? 'black':'white'}>
-                                                                                Set the date and time when your artwork will be published
-                                                                            </Text>
-                                                                            <Box mt={25}>
-                                                                                <Box>
-                                                                                    <Text mb={1} color={colorMode == 'light' ? 'black':'white'}>Date</Text>
-                                                                                    <Popover.Root open={isOpenDatePicker} onFocusOutside={() => setIsOpenDatePicker(false)}>
-                                                                                        <Popover.Trigger asChild>
-                                                                                            <Input
-                                                                                                color={colorMode == 'light' ? 'black':'white'}
-                                                                                                value={formattedDate}
-                                                                                                placeholder="Set Date"
-                                                                                                readOnly
-                                                                                                cursor="pointer"
-                                                                                                onClick={() => setIsOpenDatePicker(true)}
-                                                                                            />
-                                                                                        </Popover.Trigger>
-                                                                                        <Portal>
-                                                                                            <Popover.Positioner>
-                                                                                                <Popover.Content>
-                                                                                                    <Popover.Arrow />
-                                                                                                    <Popover.Body>
-                                                                                                        <DayPicker
-                                                                                                            mode="single"
-                                                                                                            selected={scheduleDate}
-                                                                                                            onSelect={handleDateSelect}
-                                                                                                            style={{
-                                                                                                                color: colorMode == "light" ? "black":"white"
-                                                                                                            }}
-                                                                                                            captionLayout={"dropdown"}
-                                                                                                            navLayout={"around"}
-                                                                                                        />
-                                                                                                    </Popover.Body>
-                                                                                                </Popover.Content>
-                                                                                            </Popover.Positioner>
-                                                                                        </Portal>
-                                                                                    </Popover.Root>
-                                                                                </Box>
-                                                                                <Box mt={5}>
-                                                                                    <Text mb={1} color={colorMode == 'light' ? 'black':'white'}>Time</Text>
-                                                                                    <Input
-                                                                                        type="time"
-                                                                                        placeholder="Set Time"
-                                                                                        value={scheduleTime} 
-                                                                                        onChange={handleTimeChange}
-                                                                                        cursor="pointer"
-                                                                                        color={colorMode == 'light' ? 'black':'white'}
-                                                                                    />
-                                                                                </Box>
-                                                                            </Box>
-                                                                        </Drawer.Body>
-                                                                        <Drawer.Footer>
-                                                                            <Button 
-                                                                                color={colorMode == 'light' ? 'cyan.600':'white'}
-                                                                                bg={colorMode == 'light' ? 'white':'black'}
-                                                                                borderColor={colorMode == 'light' ? 'cyan.600':'white'}
-                                                                                onClick={() => setOpenDrawer(false)}
-                                                                            >
-                                                                                Cancel
-                                                                            </Button>
-                                                                            <Button
-                                                                                bg={colorMode === "light" ? "cyan.600":"pink.600"}
-                                                                                color={"whiteAlpha.950"}
-                                                                                maxW={"45%"}
-                                                                                onClick={handleSchedulePost}
-                                                                            >
-                                                                                Schedule
-                                                                            </Button>
-                                                                        </Drawer.Footer>
-                                                                        <Drawer.CloseTrigger asChild>
-                                                                            <CloseButton 
-                                                                                size="sm"
-                                                                                color={colorMode == 'light' ? 'cyan.600':'white'}
-                                                                                bg={colorMode == 'light' ? 'white':'black'}
-                                                                                borderColor={colorMode == 'light' ? 'cyan.600':'white'} 
-                                                                            />
-                                                                        </Drawer.CloseTrigger>
-                                                                    </Drawer.Content>
-                                                                </Drawer.Positioner>
-                                                            </Portal>
-                                                        </Drawer.Root>
+                                                        <Button 
+                                                            variant="outline" 
+                                                            size="sm"
+                                                            bg={colorMode === "light" ? "cyan.600":"pink.600"}
+                                                            color={"whiteAlpha.950"}
+                                                            maxW={"45%"}
+                                                            onClick={() => setOpenDrawer(true)}
+                                                        >
+                                                            <RiCalendarScheduleFill />
+                                                            {schedule?.label}
+                                                        </Button>
                                                     </Show>
+                                                    <Spacer/>
                                                     <Button
                                                         bg={colorMode === "light" ? "cyan.600":"pink.600"}
                                                         color={"whiteAlpha.950"}
@@ -992,6 +756,7 @@ const NewArtwork = () => {
                                                 <Show
                                                     when={!watch('status') && draft}
                                                 >
+                                                    <Spacer/>
                                                     <Button
                                                         bg={colorMode === "light" ? "cyan.600":"pink.600"}
                                                         color={"whiteAlpha.950"}
@@ -1017,6 +782,22 @@ const NewArtwork = () => {
                     />
                 </Show>
             </Box>
+            
+            <MultimediaDialog 
+                isOpen={isModalOpen}
+                type={"images"}
+                fileURL={fileURL}
+                aspectRatio={1/1}
+                onComplete={handleComplete}
+                onClose={handleClose}
+            />
+            
+            <ScheduleDrawer 
+                isOpen={openDrawer}
+                interval={60}
+                onClose={() => setOpenDrawer(false)}
+                onSchedule={(date, time) => handleSchedulePost(date, time)}
+            />
         </Show>
     )
 }

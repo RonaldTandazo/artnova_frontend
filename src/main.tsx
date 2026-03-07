@@ -2,22 +2,28 @@ import { Provider } from "@/components/ui/provider"
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { AuthProvider } from './context/AuthContext.tsx'; 
+import { GlobalStateProvider } from './context/GlobalContext.tsx'; 
 import { BrowserRouter as Router } from 'react-router-dom';
 import './index.css'
 import AppRoutes from './routes/AppRoutes';
-import { ApolloProvider } from "@apollo/client";
+import { ApolloProvider } from "@apollo/client/react";
 import { client } from "./utils/ApolloClient.ts";
+import AuthLoader from "./custom/Components/Loaders/AuthLoader.tsx";
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
+  // <StrictMode>
     <Router>
       <ApolloProvider client={client}>
-        <AuthProvider>
-          <Provider>
-            <AppRoutes />
-          </Provider>
-        </AuthProvider>
+        <GlobalStateProvider>
+          <AuthProvider>
+            <Provider>
+              <AuthLoader>
+                <AppRoutes />
+              </AuthLoader>
+            </Provider>
+          </AuthProvider>
+        </GlobalStateProvider>
       </ApolloProvider>
     </Router>
-  </StrictMode>,
+  // </StrictMode>,
 )

@@ -1,82 +1,126 @@
 import { useColorMode } from "@/components/ui/color-mode";
 import { useAuth } from "@/context/AuthContext";
-import { Box, Button, EmptyState, Flex, For, Grid, GridItem, Icon, IconButton, Image, Separator, Show, Stack, Text, VStack } from "@chakra-ui/react";
+import { Box, Flex, Grid, IconButton, Show } from "@chakra-ui/react";
 import { Tooltip } from "@/components/ui/tooltip";
 import { useEffect, useState } from "react";
-import { BsGlobe2, BsTelephoneFill } from "react-icons/bs";
-import { MdEmail, MdHideSource } from "react-icons/md";
-import { SlArrowDown, SlArrowUp } from "react-icons/sl";
-import { FaPlusSquare, FaUserEdit } from "react-icons/fa";
-import { motion, AnimatePresence } from 'framer-motion';
-import { IoEye, IoEyeOff } from "react-icons/io5";
-import { useNavigate } from "react-router-dom";
-import IconsSocialMedia from "@/custom/Components/IconsSocialMedia";
+import { IoEye } from "react-icons/io5";
+import { useNavigate, useParams } from "react-router-dom";
 import { useGetUserSocialMedia } from "@/services/UserSocialNetwork/UserSocialNetworkService";
-import LoadingScreen from "@/custom/Templates/LoadingScreen";
-import { useGetUserArtworks } from "@/services/Artwork/ArtworkService";
-import ArtworkItem from "@/custom/Components/ArtworkItem";
-import { useSubscription } from "@apollo/client";
+import { useDeleteUserArtworks, useGetUserArtworks } from "@/services/Artwork/ArtworkService";
+import { useSubscription } from "@apollo/client/react";
 import { NEW_ARTWORK_SUBSCRIPTION } from "@/graphql/Artwork/ArtworkSubscription";
-import { ImUser } from "react-icons/im";
-import LoadingProgress from "@/custom/Components/LoadingProgress";
-import Empty from "@/custom/Templates/Empty";
-
-interface Artwork {
-    artworkId: number,
-    title: string,
-    thumbnail: string,
-    publishingId: number,
-    createdAt: string,
-    owner: string
-}
-
-interface UserSocialNetwork {
-    userSocialNetworkId: number,
-    network: string,
-    link: string
-}
-
-const backendUrl = import.meta.env.VITE_API_URL;
+import LoadingProgress from "@/custom/Components/States/LoadingProgress";
+import { decodeFromBase64, encodeToBase64 } from "@/utils/Helpers";
+import { useGetUserData } from "@/services/User/UserService";
+import { GeneralInfoInterface } from "@/graphql/User/UserInterfaces";
+import { useGetFollowState, useSetFollowState, useUnsetFollowState } from "@/services/Follow/FollowService";
+import ArtistSidebar from "@/custom/Components/Profile/ArtistSidebar";
+import ArtistContent from "@/custom/Components/Profile/ArtistContent";
+import { GetArtworksWS } from "@/custom/interfaces/Profile/Profile";
+import { Artwork } from "@/custom/interfaces/Profile/ArtistContent";
+import { UserSocialMedia } from "@/custom/interfaces/ProfileSettings/ProfileSocialMedia";
 
 const Profile = () => {
-    const { colorMode } = useColorMode();
-    const { user } = useAuth();
-    const [isSummaryExpanded, setIsSummaryExpanded] = useState(false);
-    const [isUserInfoVisible, setIsUserInfoVisible] = useState(true);
     const navigate = useNavigate();
-    const [userSocialMedia, setUserSocialMedia] = useState([]);
-    const [artworks, setArtworks] = useState([])
-    const [openMenuId, setOpenMenuId] = useState<number | null>(null);
+    const { user } = useAuth();
+    const { value, module } = useParams();
+    const { colorMode } = useColorMode();
+
+    const [loading, setLoading] = useState<boolean>(true);
+    const [isSummaryExpanded, setIsSummaryExpanded] = useState<boolean>(false);
+    const [isUserInfoVisible, setIsUserInfoVisible] = useState<boolean>(true);
+    const [userSocialMedia, setUserSocialMedia] = useState<UserSocialMedia[]>([]);
+    const [artworks, setArtworks] = useState<Artwork[]>([])
+    const [openMenuId, setOpenMenuId] = useState<number | undefined>(undefined);
+    const [isOwnProfile, setIsOwnProfile] = useState<boolean>(true)
+    const [userData, setUserData] = useState<GeneralInfoInterface | undefined>(undefined)
+    const [isFollowed, setIsFollowed] = useState<boolean>(false)
     
     const { getUserSocialMedia, data: userSocialMediaData, loading: userSocialMediaLoading } = useGetUserSocialMedia();
     const { getUserArtworks, data: userArtworksData, loading: userArtworksLoading } = useGetUserArtworks();
-    const { data, loading, error } = useSubscription(NEW_ARTWORK_SUBSCRIPTION);
+    const { deleteUserArtworks } = useDeleteUserArtworks();
+    const { getUserGeneralData, data: userGeneralData } = useGetUserData();
+    const { getFollowState, data: followStateData } = useGetFollowState();
+    const { setFollowState } = useSetFollowState();
+    const { unsetFollowState } = useUnsetFollowState();
+    const { data } = useSubscription<GetArtworksWS>(NEW_ARTWORK_SUBSCRIPTION);
 
     const charsPerLine = 50;
     const maxLines = 2;
-    const estimatedLines = user?.summary && user.summary !== '' ? Math.ceil(user?.summary.length / charsPerLine) : 0;
+    const estimatedLines = userData?.summary && userData.summary !== '' ? Math.ceil(userData?.summary.length / charsPerLine) : 0;
     const shouldExpand = estimatedLines > maxLines;
 
-    const truncatedSummary = user?.summary && shouldExpand && !isSummaryExpanded
-        ? user.summary.slice(0, maxLines * charsPerLine) + '...'
-        : user?.summary;
+    const truncatedSummary = userData?.summary && shouldExpand && !isSummaryExpanded
+        ? userData.summary.slice(0, maxLines * charsPerLine) + '...'
+        : userData?.summary;
 
     useEffect(() => {
-        getUserArtworks()
-        getUserSocialMedia();
-    }, []);
+        if(value && module){
+            const userId = parseInt(decodeFromBase64(value));
+            const moduleDecoded = decodeFromBase64(module);
+            
+            setLoading(true);
+            setArtworks([]);
+            setUserSocialMedia([]);
+            setUserData(undefined);
+            setIsOwnProfile(moduleDecoded === 'OwnProfile');
+            setOpenMenuId(undefined);
+            
+            const searchData = {
+                userId: userId,
+                module: moduleDecoded
+            }
+            
+            if(moduleDecoded != 'OwnProfile') {
+                getUserGeneralData(userId)
+                getFollowState({followedId: userId})
+            } else {
+                if(user){    
+                    setUserData({
+                        ...user,
+                        chatId: undefined
+                    });
+                }
+            }
+            
+            getUserArtworks(searchData)
+            getUserSocialMedia(searchData);
+        }
+    }, [value, module, user]);
+
+    useEffect(() => {
+        if(!isOwnProfile && userGeneralData && userGeneralData.getUserGeneralData){
+            setUserData(userGeneralData.getUserGeneralData)
+        }
+    }, [userGeneralData, isOwnProfile])
+
+    useEffect(() => {
+        if(!isOwnProfile && followStateData && followStateData.getFollowState){
+            setIsFollowed(followStateData.getFollowState.isFollowed)
+        }
+    }, [followStateData, isOwnProfile])
 
     useEffect(() => {
         if (userSocialMediaData && userSocialMediaData.getUserSocialMedia) {
             setUserSocialMedia(userSocialMediaData.getUserSocialMedia)
         }
-    }, [userSocialMediaData]);
+    }, [userSocialMediaData, isOwnProfile]);
 
     useEffect(() => {
         if (userArtworksData && userArtworksData.getUserArtworks) {
-            setArtworks(userArtworksData.getUserArtworks)
+            if(!isOwnProfile){
+                const restrictedIds = [1, 3 ,4]
+                const filterArtworks = userArtworksData.getUserArtworks.filter((artwork) => !restrictedIds.includes(artwork.publishingId))
+                
+                setArtworks(filterArtworks)
+            }else{
+                console.log(userArtworksData.getUserArtworks)
+                setArtworks(userArtworksData.getUserArtworks)
+            }
+
+            setLoading(false)
         }
-    }, [userArtworksData]);
+    }, [userArtworksData, isOwnProfile]);
 
     useEffect(() => {
         if (data && data.newArtwork) {
@@ -86,22 +130,57 @@ const Profile = () => {
     }, [data]);
 
     const handleNavigateSettings = () => {
-        if (user && user?.username) {
-            navigate(`/ProfileSettings/${user.username}`)
+        if (user && isOwnProfile) {
+            const encodedUserId = encodeToBase64(user.userId);
+            const encodedModule = encodeToBase64('ProfileSettings');
+            
+            navigate(`/ProfileSettings/${encodedUserId}/${encodedModule}`)
         }
     }
 
     const handleNavigateNewArt = () => {
-        navigate(`/ArtWorks/New`)
+        if(user && isOwnProfile){
+            const encodedUserId = encodeToBase64(user.userId);
+            const encodedModule = encodeToBase64('NewArtwork');
+
+            navigate(`/ArtWorks/New/${encodedUserId}/${encodedModule}`)
+        }
     }
 
-    const handleMenuOpen = (id: number | null) => {
-        setOpenMenuId(id);
+    const handleMenuOpen = (artworkId: number | undefined) => {
+        setOpenMenuId(artworkId);
     };
+
+    const handleFollowState = (state: boolean) => {
+        if(!isOwnProfile && user && userData){
+            const data = {
+                followedId: userData.userId
+            }
+    
+            if(state){
+                setIsFollowed(true)
+                setFollowState(data)
+            }else{
+                unsetFollowState(data)
+                setIsFollowed(false)
+            }
+        }
+    }
+
+    const deleteArtworks = (artworkIds: number[]) => {
+        if(user && isOwnProfile && artworkIds.length > 0){
+            const deleteArtworks = {
+                artworkIds: artworkIds,
+            };
+            deleteUserArtworks(deleteArtworks)
+
+            setArtworks(prev => prev.filter(artwork => !artworkIds.includes(artwork.artworkId)));
+        }
+    }
 
     return (
         <Show
-            when={!userSocialMediaLoading && !userArtworksLoading}
+            when={!userSocialMediaLoading && !userArtworksLoading && !loading}
             fallback={
                 <LoadingProgress />
             }
@@ -113,279 +192,37 @@ const Profile = () => {
                     gap={5}
                     alignItems={"start"}
                 >
-                    <AnimatePresence>
-                        <Show
-                            when={isUserInfoVisible}
-                        >
-                            <motion.div
-                                key="userInfo"
-                                initial={{ x: "-100%" }}
-                                animate={{ x: 0 }}
-                                exit={{ x: "-100%", transition: { duration: 0.3 } }}
-                                transition={{ duration: 0.3 }}
-                                style={{ gridColumn: "1 / 2" }}
-                            >
-                                <GridItem
-                                    bg={colorMode === 'light' ? "whiteAlpha.950" : "blackAlpha.500"}
-                                    rounded={"lg"}
-                                    shadow={"lg"}
-                                    p={7}
-                                    overflowY={"auto"}
-                                    maxH={"80vh"}
-                                    maxW={"20vW"}
-                                >
-                                    <Box position="relative" width={"100%"}>
-                                        <Tooltip
-                                            content="Hide Profile"
-                                            openDelay={500}
-                                            closeDelay={100}
-                                            unmountOnExit={true}
-                                            lazyMount={true}
-                                            positioning={{ placement: 'top' }}
-                                            showArrow
-                                            contentProps={{
-                                                css: {
-                                                    '--tooltip-bg': colorMode === 'light' ? 'colors.cyan.600' : 'colors.pink.600',
-                                                    'color': 'white',
-                                                },
-                                            }}
-                                        >
-                                            <IconButton
-                                                onClick={() => setIsUserInfoVisible(false)}
-                                                borderRadius="full"
-                                                colorScheme="black"
-                                                size="md"
-                                                bg={"transparent"}
-                                                color={colorMode === "light" ? "cyan.600" : "pink.600"}
-                                                position="absolute"
-                                                top="-20px"
-                                                left="-20px"
-                                            >
-                                                <IoEyeOff />
-                                            </IconButton>
-                                        </Tooltip>
-                                        <Tooltip
-                                            content="Edit Profile"
-                                            openDelay={500}
-                                            closeDelay={100}
-                                            unmountOnExit={true}
-                                            lazyMount={true}
-                                            positioning={{ placement: 'top' }}
-                                            showArrow
-                                            contentProps={{
-                                                css: {
-                                                    '--tooltip-bg': colorMode === 'light' ? 'colors.cyan.600' : 'colors.pink.600',
-                                                    'color': 'white',
-                                                },
-                                            }}
-                                        >
-                                            <IconButton
-                                                borderRadius="full"
-                                                colorScheme="black"
-                                                size="md"
-                                                bg={"transparent"}
-                                                color={colorMode === "light" ? "cyan.600" : "pink.600"}
-                                                position="absolute"
-                                                top="-20px"
-                                                right="-20px"
-                                                onClick={handleNavigateSettings}
-                                            >
-                                                <FaUserEdit />
-                                            </IconButton>
-                                        </Tooltip>
-                                        <Stack>
-                                            <Box
-                                                w="100%"
-                                                display={"flex"}
-                                                justifyContent="center"
-                                                alignItems="center"
-                                            >
-                                                <Show
-                                                    when={user.avatar}
-                                                    fallback={
-                                                        <Icon
-                                                            as={ImUser}
-                                                            boxSize="200px"
-                                                            color={colorMode === 'light' ? 'cyan.50' : 'pink.200'}
-                                                            bg={colorMode === 'light' ? 'cyan.600' : 'pink.600'}
-                                                            rounded={'full'}
-                                                            cursor="pointer"
-                                                        />
-                                                    }
-                                                >
-                                                    <Image
-                                                        src={`${backendUrl}/avatars/${user.avatar}`}
-                                                        alt="Stored Image"
-                                                        boxSize="200px"
-                                                        borderRadius="full"
-                                                        fit="cover"
-                                                        cursor="pointer"
-                                                    />
-                                                </Show>
-                                            </Box>
-                                            <Box
-                                                w="100%"
-                                                my={5}
-                                            >
-                                                <Text fontSize={"3xl"} justifySelf={"center"} textAlign={"center"} fontWeight={"extrabold"}>{user?.firstName} {user?.lastName}</Text>
-                                                <Text fontSize={"xl"} justifySelf={"center"} textAlign={"center"}>{user?.username}</Text>
-                                            </Box>
-                                            <Show when={user?.professionalHeadline && user.professionalHeadline !== ''}>
-                                                <Box>
-                                                    <Text fontSize={"md"} justifySelf={"start"} textAlign={"justify"}>{user?.professionalHeadline}</Text>
-                                                </Box>
-                                            </Show>
-                                            <Stack my={5} w="100%" gap={2}>
-                                                <Show when={user?.email && user.email !== ''}>
-                                                    <Flex align="center" visibility={user?.email}>
-                                                        <MdEmail />
-                                                        <Text fontSize={"md"} ml={2}>
-                                                            {user?.email}
-                                                        </Text>
-                                                    </Flex>
-                                                </Show>
-                                                <Show when={user?.location && user.location !== ''}>
-                                                    <Flex align="center" >
-                                                        <BsGlobe2 />
-                                                        <Text fontSize={"md"} ml={2}>
-                                                            {user?.location}
-                                                        </Text>
-                                                    </Flex>
-                                                </Show>
-                                                <Show when={user?.telephone && user.telephone !== ''}>
-                                                    <Flex align="center" >
-                                                        <BsTelephoneFill />
-                                                        <Text fontSize={"md"} ml={2}>
-                                                            {user?.telephone}
-                                                        </Text>
-                                                    </Flex>
-                                                </Show>
-                                            </Stack>
-                                            <Show when={user?.summary && user.summary !== ''}>
-                                                <Separator variant={"solid"} style={{ color: "white" }} />
-                                                <Box w="100%" mt={2} mb={5}>
-                                                    <Text fontSize={"xl"} fontWeight={"medium"} mb={3}>Summary</Text>
-                                                    <Text textAlign={"justify"}>{truncatedSummary}</Text>
-                                                    <Show when={shouldExpand}>
-                                                        <Text
-                                                            mt={2}
-                                                            cursor="pointer"
-                                                            textDecoration="none"
-                                                            _hover={{ textDecoration: "underline" }}
-                                                            color={colorMode === "light" ? "cyan.600" : "pink.600"}
-                                                            onClick={() => setIsSummaryExpanded(!isSummaryExpanded)}
-                                                            display="flex"
-                                                            alignItems="center"
-                                                            gap={1}
-                                                        >
-                                                            <span style={{ marginRight: '5px' }}>
-                                                                {isSummaryExpanded ? "Show Less" : "Show More"}
-                                                            </span>
-                                                            <Show 
-                                                                when={isSummaryExpanded} 
-                                                                fallback={
-                                                                    <span>
-                                                                        <SlArrowDown />
-                                                                    </span>
-                                                                }
-                                                            >
-                                                                <span>
-                                                                    <SlArrowUp />
-                                                                </span>
-                                                            </Show>
-                                                        </Text>
-                                                    </Show>
-                                                </Box>
-                                            </Show>
-                                            <Show when={userSocialMedia && userSocialMedia.length > 0}>
-                                                <Separator variant={"solid"} style={{ color: "white" }} />
-                                                <Box w="100%" mt={2}>
-                                                    <Text fontSize={"xl"} fontWeight={"medium"} mb={3}>Social Media</Text>
-                                                    <Flex 
-                                                        gap={4}
-                                                        display="grid" 
-                                                        gridTemplateColumns="repeat(12, 1fr)"
-                                                        gridAutoRows="auto"
-                                                    >
-                                                        <For
-                                                            each={userSocialMedia}
-                                                        >
-                                                            {(item: UserSocialNetwork) => {
-                                                                return (
-                                                                    <IconsSocialMedia key={item.userSocialNetworkId} socialNetwork={item.network} link={item.link} size={'lg'} />
-                                                                )
-                                                            }}
-                                                        </For>
-                                                    </Flex>
-                                                </Box>
-                                            </Show>
-                                        </Stack>
-                                    </Box>
-                                </GridItem>
-                            </motion.div>
-                        </Show>
-                    </AnimatePresence>
-                    <GridItem
-                        style={{ gridColumn: isUserInfoVisible ? "2 / 3" : "1 / 2" }}
-                        w={"full"}
-                    >
-                        <Stack gap="5" align="flex-start">
-                            <Flex gap="3" direction={"row"} mb={0} justifyContent="space-between" width="100%">
-                                <Text alignSelf={"center"} fontSize={"3xl"} fontWeight={"medium"}>ArtWorks</Text>
-                                <Button
-                                    size="xs"
-                                    bg={colorMode === "light" ? "cyan.600" : "pink.600"}
-                                    color={"white"}
-                                    shadow={"lg"}
-                                    onClick={handleNavigateNewArt}
-                                    borderRadius={"md"}
-                                >
-                                    <FaPlusSquare /> New ArtWork
-                                </Button>
-                            </Flex>
-                            <Box
-                                bg={colorMode === 'light' ? "whiteAlpha.950" : "blackAlpha.500"}
-                                rounded={"lg"}
-                                shadow={"lg"}
-                                p={7}
-                                w={"full"}
-                                overflowY={"clip"}
-                            >
-                                <Show 
-                                    when={artworks && artworks.length > 0} 
-                                    fallback={
-                                        <Empty
-                                            title="Oooh no!... You don't have any ArtWork created yet 😢"
-                                            default_description={false}
-                                        />
-                                    }
-                                >
-                                    <Grid 
-                                        templateRows="repeat(auto, auto)"
-                                        templateColumns="repeat(7, 1fr)" 
-                                        gap={1}
-                                    >
-                                        <For each={artworks}>
-                                            {(artwork: Artwork) => (
-                                                <ArtworkItem 
-                                                    key={artwork.artworkId}
-                                                    artwork={artwork}
-                                                    isOpen={openMenuId === artwork.artworkId}
-                                                    onMenuToggle={handleMenuOpen}
-                                                />
-                                            )}
-                                        </For>
-                                    </Grid>
-                                </Show>
-                            </Box>
-                        </Stack>
-                    </GridItem>
+                    <ArtistSidebar
+                        isSummaryExpanded = {isSummaryExpanded}
+                        onToggleSummary={() => setIsSummaryExpanded(!isSummaryExpanded)} 
+                        isUserInfoVisible = {isUserInfoVisible}
+                        onToggleVisible={() => setIsUserInfoVisible(!isUserInfoVisible)} 
+                        isOwnProfile = {isOwnProfile}
+                        userSocialMedia = {userSocialMedia}
+                        shouldExpand = {shouldExpand}
+                        userData= {userData}
+                        isFollowed = {isFollowed}
+                        user = {user}
+                        truncatedSummary = {truncatedSummary}
+                        onFollow = {handleFollowState}
+                        goSettings = {handleNavigateSettings}
+                    />
+                    
+                    <ArtistContent
+                        artworks = {artworks}
+                        isOwnProfile = {isOwnProfile}
+                        isUserInfoVisible = {isUserInfoVisible}
+                        openMenuId = {openMenuId}
+                        onMenuOpen = {handleMenuOpen}
+                        onNewArt = {handleNavigateNewArt}
+                        onDelete={deleteArtworks}
+                    />
                 </Grid>
                 <Flex>
                     <Show when={!isUserInfoVisible}>
                         <Tooltip
                             content="Unhide Profile"
-                            openDelay={500}
+                            openDelay={200}
                             closeDelay={100}
                             unmountOnExit={true}
                             lazyMount={true}

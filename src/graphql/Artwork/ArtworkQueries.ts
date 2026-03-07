@@ -1,4 +1,5 @@
-import { gql } from '@apollo/client';
+import { gql } from '@apollo/client/core';
+import { Stats } from '../ArtworkComment/ArtworkStatisticsQueries';
 
 export const GET_ARTVERSE_ARTWORKS = gql`    
     query GetArtVerseArtworks{ 
@@ -18,16 +19,20 @@ export const GET_ARTVERSE_ARTWORKS = gql`
 `;
 
 export const GET_USER_ARTWORKS = gql`    
-    query GetUserArtworks{ 
-        getUserArtworks{
+    query GetUserArtworks($data: UserVariablesInput!){ 
+        getUserArtworks(data: $data){
             artworkId
             title
             thumbnail
             publishingId
-            owner
-            createdAt
+            scheduleDate
+            scheduleTime
+            stats{
+                ...Stats
+            }
         }
     }
+    ${Stats}
 `;
 
 export const GET_ARTWORK_FORM_DATA = gql`    
@@ -54,6 +59,21 @@ export const GET_ARTWORK_FORM_DATA = gql`
     }
 `;
 
+const StandardPayload = gql`
+    fragment StandardFields on StandardPayload {
+        value
+        label
+    }
+`;
+
+const ArtworkOwner = gql`
+    fragment ArtworkOwner on ArtworkOwnerPayload {
+        userId
+        username
+        avatar
+    }
+`;
+
 export const GET_ARTWORK_DETAILS = gql`    
     query GetArtworkDetails($artworkId: Int!){ 
         getArtworkDetails(artworkId: $artworkId){
@@ -61,18 +81,25 @@ export const GET_ARTWORK_DETAILS = gql`
             title
             description
             matureContent
-            categories
+            categories {
+                ...StandardFields
+            }
             topics {
-                value
-                label
+                ...StandardFields
             }
             softwares {
-                value
-                label
+                ...StandardFields
             }
             publishingId
             thumbnail
+            images
+            videos
+            owner{
+                ...ArtworkOwner
+            }
             createdAt
         }
     }
+    ${ArtworkOwner}
+    ${StandardPayload}
 `;

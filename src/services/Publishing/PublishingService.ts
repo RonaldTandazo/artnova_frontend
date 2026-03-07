@@ -1,4 +1,5 @@
-import { ApolloError, useLazyQuery } from '@apollo/client';
+import { CombinedGraphQLErrors } from '@apollo/client/errors';
+import { useLazyQuery } from "@apollo/client/react";
 import { GET_PUBLISHING } from '@/graphql/Publishing/PublishingQueries';
 
 export const useGetPublishing = () => {
@@ -8,7 +9,7 @@ export const useGetPublishing = () => {
         try {
             await getPublishing();
         } catch (err) {
-            if (err instanceof ApolloError) {
+            if (err instanceof CombinedGraphQLErrors) {
                 console.error(err.message);
             }
         }

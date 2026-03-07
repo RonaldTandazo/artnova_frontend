@@ -10,21 +10,21 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@apollo/client": "^3.13.4",
+    "@apollo/client": "^4.0.5",
     "@chakra-ui/icons": "^2.2.4",
-    "@chakra-ui/react": "^3.13.0",
+    "@chakra-ui/react": "^3.34.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@react-three/drei": "^10.0.4",
     "@react-three/fiber": "^9.1.2",
     "@reduxjs/toolkit": "^2.6.1",
+    "apollo-upload-client": "^19.0.0",
     "crypto-browserify": "^3.12.1",
     "framer-motion": "^12.5.0",
     "graphql": "^16.10.0",
     "graphql-ws": "^6.0.4",
     "next-themes": "^0.4.6",
     "react": "^19.0.0",
-    "react-day-picker": "^9.9.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.54.2",
     "react-icons": "^5.5.0",
@@ -32,10 +32,12 @@
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.3.0",
     "three": "^0.174.0",
-    "three-stdlib": "^2.35.15"
+    "three-stdlib": "^2.35.15",
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
+    "@types/apollo-upload-client": "^18.0.0",
     "@types/node": "^22.13.10",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",

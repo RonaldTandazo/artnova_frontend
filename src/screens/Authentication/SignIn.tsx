@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BiLogIn } from "react-icons/bi";
 import { useColorMode } from "@/components/ui/color-mode";
-import NotificationAlert from "@/custom/Components/NotificationAlert";
+import NotificationAlert from "@/custom/Components/States/NotificationAlert";
 
 interface FormValues {
     username: string;
@@ -120,7 +120,7 @@ const SignIn = () => {
                 <Card.Footer alignSelf={"center"}>
                     <Stack align="center">
                         <Card.Description>Don't have an account?</Card.Description>
-                        <Button color={"white"} bg={colorMode === "light" ? "blackAlpha.800":""} onClick={() => navigate("/signup")} size={"xs"}>
+                        <Button color={"white"} bg={colorMode === "light" ? "blackAlpha.800":""} onClick={() => navigate("/SignUp")} size={"xs"}>
                             Sign Up Here
                         </Button>
                     </Stack>

@@ -1,9 +1,8 @@
-import { ApolloClient, InMemoryCache, HttpLink, from, split, Observable } from '@apollo/client';
-import { setContext } from "@apollo/client/link/context";
+import { ApolloClient, InMemoryCache, from, split, Observable, ApolloLink } from '@apollo/client';
 import { getMainDefinition } from '@apollo/client/utilities';
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
 import { createClient } from 'graphql-ws';
-import { onError } from '@apollo/client/link/error';
+import UploadHttpLink from 'apollo-upload-client/UploadHttpLink.mjs';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 const wsUrl = import.meta.env.VITE_WS_URL;
@@ -27,105 +26,93 @@ export const setAuthCallbacks = (
   performLogout = logoutCallback;
 };
 
-const httpLink = new HttpLink({
+const httpLink = new UploadHttpLink({
   uri: `${apiUrl}/graphql`,
 });
 
-const authLink = setContext((_, { headers }) => {
+const authLink = new ApolloLink((operation, forward) => {
   const token = getAccessToken();
-  return {
-    headers:{
-      ...headers,
-      authorization: token ? `Bearer ${token}`:""
+  operation.setContext({
+    headers: {
+      authorization: token ? `Bearer ${token}` : ""
     }
-  }
+  });
+  return forward(operation);
 });
 
-const errorLink = onError(({ graphQLErrors, operation, forward }) => {
-  if (graphQLErrors) {
-    for (let err of graphQLErrors) {
-      if (err.extensions?.code === 'UNAUTHENTICATED' || err.message.includes('Unauthorized')) {
-        const refreshToken = getRefreshToken();
+const errorLink = new ApolloLink((operation, forward) => {
+  return new Observable(observer => {
+    let subscriber = forward(operation).subscribe({
+      next: (result) => observer.next(result),
+      error: (networkError) => {
+        const { graphQLErrors } = networkError;
+        
+        if (graphQLErrors) {
+          for (let err of graphQLErrors) {
+            if (err.extensions?.code === 'UNAUTHENTICATED' || err.message.includes('Unauthorized')) {
+              const refreshToken = getRefreshToken();
 
-        if (!refreshToken) {
-          performLogout();
-          return;
-        }
-
-        if (isRefreshing) {
-          return new Observable(observer => {
-            refreshTokenPromise!.then(() => {
-              const oldHeaders = operation.getContext().headers;
-              operation.setContext({
-                headers: {
-                  ...oldHeaders,
-                  authorization: `Bearer ${getAccessToken()}`,
-                },
-              });
-              const subscriber = forward(operation).subscribe(observer);
-              return () => subscriber.unsubscribe();
-            }).catch(error => {
-              observer.error(error);
-            });
-          });
-        }else{
-          isRefreshing = true;
-  
-          refreshTokenPromise = new Promise((resolve, reject) => {
-            callRefreshToken(refreshToken)
-              .then(({ accessToken }: any) => {
-                isRefreshing = false;
-                refreshTokenPromise = null;
-                resolve(accessToken);
-              })
-              .catch(refreshError => {
-                isRefreshing = false;
-                refreshTokenPromise = null;
+              if (!refreshToken) {
                 performLogout();
-                reject(refreshError);
-              });
-          });
-  
-          return new Observable(observer => {
-            refreshTokenPromise!.then(() => {
-              const oldHeaders = operation.getContext().headers;
-              operation.setContext({
-                headers: {
-                  ...oldHeaders,
-                  authorization: `Bearer ${getAccessToken()}`,
-                },
-              });
-              const subscriber = forward(operation).subscribe(observer);
-              return () => subscriber.unsubscribe();
-            }).catch(error => {
-              observer.error(error);
-            });
-          });
+                observer.error(networkError);
+                return;
+              }
+
+              if (isRefreshing) {
+                refreshTokenPromise!.then(() => {
+                  const oldHeaders = operation.getContext().headers;
+                  operation.setContext({
+                    headers: {
+                      ...oldHeaders,
+                      authorization: `Bearer ${getAccessToken()}`,
+                    },
+                  });
+                  const reattemptSubscriber = forward(operation).subscribe(observer);
+                  return () => reattemptSubscriber.unsubscribe();
+                }).catch(() => {
+                  observer.error(networkError);
+                });
+              } else {
+                isRefreshing = true;
+                refreshTokenPromise = new Promise((resolve, reject) => {
+                  callRefreshToken(refreshToken)
+                    .then(({ accessToken }) => {
+                      isRefreshing = false;
+                      refreshTokenPromise = null;
+                      resolve(accessToken);
+                    })
+                    .catch(refreshError => {
+                      isRefreshing = false;
+                      refreshTokenPromise = null;
+                      performLogout();
+                      reject(refreshError);
+                    });
+                });
+                
+                refreshTokenPromise!.then(() => {
+                  const oldHeaders = operation.getContext().headers;
+                  operation.setContext({
+                    headers: {
+                      ...oldHeaders,
+                      authorization: `Bearer ${getAccessToken()}`,
+                    },
+                  });
+                  const reattemptSubscriber = forward(operation).subscribe(observer);
+                  return () => reattemptSubscriber.unsubscribe();
+                }).catch(() => {
+                  observer.error(networkError);
+                });
+              }
+              return;
+            }
+          }
         }
-
-
-        // return new Observable(observer => {
-        //   callRefreshToken(refreshToken)
-        //     .then(({ accessToken }: any) => {
-        //       const oldHeaders = operation.getContext().headers;
-        //       operation.setContext({
-        //         headers: {
-        //           ...oldHeaders,
-        //           authorization: `Bearer ${accessToken}`,
-        //         },
-        //       });
-        //       const subscriber = forward(operation).subscribe(observer);
-        //       return () => subscriber.unsubscribe();
-        //     })
-        //     .catch(refreshError => {
-        //       console.error("Error al refrescar el token (Apollo):", refreshError);
-        //       performLogout();
-        //       observer.error(refreshError);
-        //     });
-        // });
-      }
-    }
-  }
+        observer.error(networkError);
+      },
+      complete: () => observer.complete(),
+    });
+    return () => subscriber.unsubscribe();
+  });
 });
 
 const wsLink = new GraphQLWsLink(createClient({
@@ -138,7 +125,7 @@ const wsLink = new GraphQLWsLink(createClient({
   },
 }));
 
-const splitLink = split(
+const splitLink = ApolloLink.split(
   ({ query }) => {
     const definition = getMainDefinition(query);
     return (
@@ -147,7 +134,7 @@ const splitLink = split(
     );
   },
   wsLink,
-  from([errorLink, authLink, httpLink]),
+  ApolloLink.from([errorLink, authLink, httpLink]),
 );
 
 export const client = new ApolloClient({

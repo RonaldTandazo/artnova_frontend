@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client';
+import { gql } from '@apollo/client/core';
 
 export const STORE_ARTWORK = gql`
     mutation ($artworkData: StoreArtworkInput!) { 
@@ -7,5 +7,11 @@ export const STORE_ARTWORK = gql`
             title,
             thumbnail
         }
+    }
+`;
+
+export const DELETE_USER_ARTWORKS = gql`
+    mutation ($deleteArtworks: DeleteUserArtworkInput!) { 
+        deleteUserArtworks(deleteArtworks: $deleteArtworks)
     }
 `;

@@ -1,6 +1,8 @@
-import { ApolloError, useLazyQuery, useMutation } from '@apollo/client';
+import { CombinedGraphQLErrors } from '@apollo/client/errors';
+import { useMutation, useLazyQuery } from "@apollo/client/react";
 import { REFRESH_TOKEN_MUTATION, REVOKE_TOKEN_MUTATION, SIGNIN_MUTATION, SIGNUP_MUTATION} from '@/graphql/Authentication/AuthenticationMutations';
 import { VALIDATE_USER_ACCESS } from '@/graphql/Authentication/AuthenticationQueries';
+import { LoginInterface, ValidateAccessInput, ValidateAccessInterface } from '@/graphql/Authentication/AuthenticationInterfaces';
 
 export const useSignUp = () => {
     const [signUpMutation, { loading, data, error }] = useMutation(SIGNUP_MUTATION);
@@ -8,11 +10,11 @@ export const useSignUp = () => {
     const signUp = async (firstName: string, lastName: string, email: string, username: string, password: string) => {
         try {
             const userData = { firstName, lastName, email, username, password };
-            await signUpMutation({ 
+            return await signUpMutation({ 
                 variables: { userData }
             });
         } catch (err) {
-            if (err instanceof ApolloError) {
+            if (err instanceof CombinedGraphQLErrors) {
                 console.error(err.message);
             }
         }
@@ -27,7 +29,7 @@ export const useSignUp = () => {
 };
 
 export const useLogin = () => {
-    const [loginMutation, { data, loading, error }] = useMutation(SIGNIN_MUTATION);
+    const [loginMutation, { data, loading, error }] = useMutation<LoginInterface>(SIGNIN_MUTATION);
 
     const login = async (username: string, password: string, rememberMe: boolean) => {
         try {
@@ -35,7 +37,7 @@ export const useLogin = () => {
                 variables: { username, password, rememberMe }
             });
         } catch (err) {
-            if (err instanceof ApolloError) {
+            if (err instanceof CombinedGraphQLErrors) {
                 console.error(err.message);
             }
         }
@@ -59,7 +61,7 @@ export const useRefreshToken = () => {
             });
             return response;
         } catch (err) {
-            if (err instanceof ApolloError) {
+            if (err instanceof CombinedGraphQLErrors) {
                 console.error(err.message);
             }
         }
@@ -77,13 +79,12 @@ export const useRevokeToken = () => {
     const [revokeTokenMutation, { data, loading, error }] = useMutation(REVOKE_TOKEN_MUTATION);
 
     const revokeToken = async (token: string) => {
-        console.log(token)
         try {
             await revokeTokenMutation({ 
                 variables: { refreshToken: token }
             });
         } catch (err) {
-            if (err instanceof ApolloError) {
+            if (err instanceof CombinedGraphQLErrors) {
                 console.error(err.message);
             }
         }
@@ -98,20 +99,14 @@ export const useRevokeToken = () => {
 };
 
 export const useValidateUserAccess = () => {
-    const [validateUserAccess, { loading, data, error }] = useLazyQuery(VALIDATE_USER_ACCESS, {
+    const [execute, { loading, data, error }] = useLazyQuery<ValidateAccessInterface>(VALIDATE_USER_ACCESS, {
         fetchPolicy: 'network-only'
     })
     
-    const ValidateUserAccess = async (targetValue: string, module: string) => {
-        try {
-            await validateUserAccess({
-                variables: { targetValue, module }
-            });
-        } catch (err) {
-            if (err instanceof ApolloError) {
-                console.error(err.message);
-            }
-        }
+    const ValidateUserAccess = async (data: ValidateAccessInput) => {
+        execute({
+            variables: { data }
+        });
     };
 
     return {

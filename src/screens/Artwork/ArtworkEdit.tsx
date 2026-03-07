@@ -1,7 +1,7 @@
 import { useColorMode } from "@/components/ui/color-mode";
 import { useAuth } from "@/context/AuthContext";
-import LoadingProgress from "@/custom/Components/LoadingProgress";
-import SearchableSelect from "@/custom/Components/SearchableSelect";
+import LoadingProgress from "@/custom/Components/States/LoadingProgress";
+import SearchableSelect from "@/custom/Components/Searchable/SearchableSelect";
 import { Box, Breadcrumb, Button, Card, Checkbox, CheckboxCard, Dialog, Field, FileUpload, Flex, For, Grid, GridItem, Heading, Icon, IconButton, Image, Input, Portal, Show, Spinner, Stack, Textarea } from "@chakra-ui/react";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -15,10 +15,10 @@ import { getCroppedImg } from "@/utils/CanvasCrop";
 import { GrPowerReset } from "react-icons/gr";
 import { FaCropSimple, FaNewspaper } from "react-icons/fa6";
 import { MdCancel } from "react-icons/md";
-import NotificationAlert from "@/custom/Components/NotificationAlert";
-import SearchableInput from "@/custom/Components/SearchableInput";
+import NotificationAlert from "@/custom/Components/States/NotificationAlert";
+import SearchableInput from "@/custom/Components/Searchable/SearchableInput";
 import { useGetArtworkDetails, useGetArtworkFormData, useStoreArtwork } from "@/services/Artwork/ArtworkService";
-import { decodeFromBase64 } from "@/utils/Helpers";
+import { decodeFromBase64, encodeToBase64 } from "@/utils/Helpers";
 
 interface ArtWorkForm {
     status: number[];
@@ -44,7 +44,7 @@ interface TopicOptions {
     label: string;
 }
 
-const backendUrl = import.meta.env.VITE_API_URL;
+const BACKEND_URL = import.meta.env.VITE_API_URL;
 
 const ArtworkEdit = () => {
     const { artworkId } = useParams();
@@ -139,7 +139,7 @@ const ArtworkEdit = () => {
             setSelectedTopic(artworkDetailsData.getArtworkDetails.topics)
             setSelectedSoftware(artworkDetailsData.getArtworkDetails.softwares)
             setSelectedPublishing(artworkDetailsData.getArtworkDetails.publishingId)
-            artworkDetailsData.getArtworkDetails.thumbnail ? setPreview(`${backendUrl}/thumbnails/${artworkDetailsData.getArtworkDetails.thumbnail}`):null
+            artworkDetailsData.getArtworkDetails.thumbnail ? setPreview(`${BACKEND_URL}/thumbnails/${artworkDetailsData.getArtworkDetails.thumbnail}`):null
         }
     }, [artworkDetailsData])
 
@@ -157,7 +157,10 @@ const ArtworkEdit = () => {
 
     const handleNavigate = () => {
         if(user){
-            navigate(`/Profile/${user.username}`)
+            const encodedUserId = encodeToBase64(user.userId);
+            const encodedModule = encodeToBase64('OwnProfile');
+                
+            navigate(`/Profile/${encodedUserId}/${encodedModule}`);
         }
     }
 

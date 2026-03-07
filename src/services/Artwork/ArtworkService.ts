@@ -1,6 +1,11 @@
-import { ApolloError, useLazyQuery, useMutation } from '@apollo/client';
-import { STORE_ARTWORK } from '@/graphql/Artwork/ArtworkMutations';
+import { CombinedGraphQLErrors } from '@apollo/client/errors';
+import { useMutation, useLazyQuery } from "@apollo/client/react";
+import { DELETE_USER_ARTWORKS, STORE_ARTWORK } from '@/graphql/Artwork/ArtworkMutations';
 import { GET_ARTVERSE_ARTWORKS, GET_USER_ARTWORKS, GET_ARTWORK_DETAILS, GET_ARTWORK_FORM_DATA } from '@/graphql/Artwork/ArtworkQueries';
+import { UserVariablesInterface } from '@/graphql/User/UserInterfaces';
+import { GetUserArtworks } from '@/custom/interfaces/Profile/Profile';
+import { GetArtworkInformation } from '@/custom/interfaces/ArtworkView/ArtworkView';
+import { GetArtWorkFormData, StoreArtWork } from '@/custom/interfaces/NewArtwork/NewArtwork';
 
 export const useGetArtVerseArtworks = () => {
     const [getArtVerseArtworks, { loading, data, error }] = useLazyQuery(GET_ARTVERSE_ARTWORKS, {
@@ -11,7 +16,7 @@ export const useGetArtVerseArtworks = () => {
         try {
             await getArtVerseArtworks();
         } catch (err) {
-            if (err instanceof ApolloError) {
+            if (err instanceof CombinedGraphQLErrors) {
                 console.error(err.message);
             }
         }
@@ -26,18 +31,14 @@ export const useGetArtVerseArtworks = () => {
 };
 
 export const useGetUserArtworks = () => {
-    const [getUserArtworks, { loading, data, error }] = useLazyQuery(GET_USER_ARTWORKS, {
+    const [execute, { loading, data, error }] = useLazyQuery<GetUserArtworks>(GET_USER_ARTWORKS, {
         fetchPolicy: 'cache-and-network'
     })
 
-    const GetUserArtworks = async () => {
-        try {
-            await getUserArtworks();
-        } catch (err) {
-            if (err instanceof ApolloError) {
-                console.error(err.message);
-            }
-        }
+    const GetUserArtworks = async (data: UserVariablesInterface) => {
+        return execute({
+            variables: { data }
+        });
     };
 
     return {
@@ -48,14 +49,37 @@ export const useGetUserArtworks = () => {
     };
 };
 
+export const useDeleteUserArtworks = () => {
+    const [deleteUserArtworks, { loading, data, error }] = useMutation(DELETE_USER_ARTWORKS);
+
+    const DeleteUserArtworks = async (deleteArtworks: any) => {
+        try {
+            await deleteUserArtworks({ 
+                variables: { deleteArtworks }
+            });
+        } catch (err) {
+            if (err instanceof CombinedGraphQLErrors) {
+                console.error(err.message);
+            }
+        }
+    };
+
+    return {
+        deleteUserArtworks: DeleteUserArtworks,
+        data,
+        loading,
+        error,
+    };
+};
+
 export const useGetArtworkFormData = () => {
-    const [getArtworkFormData, { loading, data, error }] = useLazyQuery(GET_ARTWORK_FORM_DATA)
+    const [getArtworkFormData, { loading, data, error }] = useLazyQuery<GetArtWorkFormData>(GET_ARTWORK_FORM_DATA)
 
     const GetArtworkFormData = async () => {
         try {
             await getArtworkFormData();
         } catch (err) {
-            if (err instanceof ApolloError) {
+            if (err instanceof CombinedGraphQLErrors) {
                 console.error(err.message);
             }
         }
@@ -70,7 +94,7 @@ export const useGetArtworkFormData = () => {
 }
 
 export const useStoreArtwork = () => {
-    const [storeArtwork, { loading, data, error }] = useMutation(STORE_ARTWORK);
+    const [storeArtwork, { loading, data, error }] = useMutation<StoreArtWork>(STORE_ARTWORK);
 
     const StoreArtwork = async (artworkData: any) => {
         try {
@@ -78,7 +102,7 @@ export const useStoreArtwork = () => {
                 variables: { artworkData }
             });
         } catch (err) {
-            if (err instanceof ApolloError) {
+            if (err instanceof CombinedGraphQLErrors) {
                 console.error(err.message);
             }
         }
@@ -93,7 +117,7 @@ export const useStoreArtwork = () => {
 };
 
 export const useGetArtworkDetails = () => {
-    const [getArtworkDetails, { loading, data, error }] = useLazyQuery(GET_ARTWORK_DETAILS)
+    const [getArtworkDetails, { loading, data, error }] = useLazyQuery<GetArtworkInformation>(GET_ARTWORK_DETAILS)
 
     const GetArtworkDetails = async (artworkId: number) => {
         try {
@@ -101,7 +125,7 @@ export const useGetArtworkDetails = () => {
                 variables: { artworkId }
             });
         } catch (err) {
-            if (err instanceof ApolloError) {
+            if (err instanceof CombinedGraphQLErrors) {
                 console.error(err.message);
             }
         }

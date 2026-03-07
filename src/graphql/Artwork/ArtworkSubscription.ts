@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client';
+import { gql } from '@apollo/client/core';
 
 export const NEW_ARTWORK_SUBSCRIPTION = gql`
     subscription {

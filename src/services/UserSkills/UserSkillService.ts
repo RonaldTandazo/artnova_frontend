@@ -1,15 +1,17 @@
+import { CombinedGraphQLErrors } from "@apollo/client/errors";
+import { useMutation, useLazyQuery } from "@apollo/client/react";
 import { STORE_USER_SKILLS } from "@/graphql/UserSkills/UserSkillsMutations";
 import { GET_SKILLS_DATA, GET_USER_SKILLS } from "@/graphql/UserSkills/UserSkillsQueries";
-import { ApolloError, useLazyQuery, useMutation } from "@apollo/client";
+import { GetSkillsData, GetUserSkills } from "@/custom/interfaces/ProfileSettings/ProfileSkillsInterests";
 
 export const useGetSkillsData = () => {
-    const [getSkillsData, { loading, data, error }] = useLazyQuery(GET_SKILLS_DATA)
+    const [getSkillsData, { loading, data, error }] = useLazyQuery<GetSkillsData>(GET_SKILLS_DATA)
 
     const GetSkillsData = async () => {
         try {
             await getSkillsData();
         } catch (err) {
-            if (err instanceof ApolloError) {
+            if (err instanceof CombinedGraphQLErrors) {
                 console.error(err.message);
             }
         }
@@ -24,13 +26,13 @@ export const useGetSkillsData = () => {
 }
 
 export const useGetUserSkills = () => {
-    const [getUserSkills, { loading, data, error }] = useLazyQuery(GET_USER_SKILLS)
+    const [getUserSkills, { loading, data, error }] = useLazyQuery<GetUserSkills>(GET_USER_SKILLS)
 
     const GetUserSkills = async () => {
         try {
             await getUserSkills();
         } catch (err) {
-            if (err instanceof ApolloError) {
+            if (err instanceof CombinedGraphQLErrors) {
                 console.error(err.message);
             }
         }
@@ -51,11 +53,11 @@ export const useStoreUserSkills= () => {
 
     const storeUserSkills = async (userSkillsData: any) => {
         try {
-            await storeUserSkillsMutation({ 
+            return await storeUserSkillsMutation({ 
                 variables: { userSkillsData }
             });
         } catch (err) {
-            if (err instanceof ApolloError) {
+            if (err instanceof CombinedGraphQLErrors) {
                 console.error(err.message);
             }
         }
