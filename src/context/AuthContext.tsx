@@ -62,7 +62,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const callRefreshTokenProcess = useCallback(async (token: string) => {
         try {
-            const { data } = await refreshTokenProcess(token);
+            const { data }: any = await refreshTokenProcess(token);
             if (data && data.refreshToken) {
                 setAccessToken(data.refreshToken.accessToken);
                 localStorage.setItem('refreshToken', data.refreshToken.refreshToken);
