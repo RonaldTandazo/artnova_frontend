@@ -6,9 +6,10 @@ import { UserVariablesInterface } from '@/graphql/User/UserInterfaces';
 import { GetUserArtworks } from '@/custom/interfaces/Profile/Profile';
 import { GetArtworkInformation } from '@/custom/interfaces/ArtworkView/ArtworkView';
 import { GetArtWorkFormData, StoreArtWork } from '@/custom/interfaces/NewArtwork/NewArtwork';
+import { GetArtVerse } from '@/custom/interfaces/ArtVerse/ArtVerse';
 
 export const useGetArtVerseArtworks = () => {
-    const [getArtVerseArtworks, { loading, data, error }] = useLazyQuery(GET_ARTVERSE_ARTWORKS, {
+    const [getArtVerseArtworks, { loading, data, error }] = useLazyQuery<GetArtVerse>(GET_ARTVERSE_ARTWORKS, {
         fetchPolicy: 'cache-and-network'
     })
 

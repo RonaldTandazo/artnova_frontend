@@ -1,5 +1,5 @@
 import { Tooltip } from "@/components/ui/tooltip";
-import { Box, Button, Flex, For, GridItem, Icon, IconButton, Image, Separator, Show, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, Flex, For, GridItem, HStack, Icon, IconButton, Image, Separator, Show, Stack, Stat, Text } from "@chakra-ui/react";
 import { BsGlobe2 } from "react-icons/bs";
 import { IoEyeOff } from "react-icons/io5";
 import { PiUserCheckFill, PiUserPlusFill } from "react-icons/pi";
@@ -24,7 +24,8 @@ const ArtistSidebar = ({
     shouldExpand, 
     userData, 
     isFollowed, 
-    user, 
+    user,
+    userStats,
     truncatedSummary, 
     onFollow, 
     goSettings 
@@ -32,6 +33,10 @@ const ArtistSidebar = ({
     const { colorMode } = useColorMode();
     const [openChat, setOpenChat] = useState<boolean>(false)
     
+    const coverUrl = userData?.cover 
+        ? `${BACKEND_URL}/covers/${userData.cover}` 
+        : null;
+
     return (
         <AnimatePresence>
             <Show
@@ -49,47 +54,42 @@ const ArtistSidebar = ({
                         bg={colorMode === 'light' ? "whiteAlpha.950" : "blackAlpha.500"}
                         rounded={"lg"}
                         shadow={"lg"}
-                        p={7}
-                        overflowY={"auto"}
+                        overflow={"hidden"}
                         maxH={"80vh"}
                         maxW={"20vW"}
                     >
-                        <Box position="relative" width={"100%"}>
-                            <Tooltip
-                                content="Hide Profile"
-                                openDelay={500}
-                                closeDelay={100}
-                                unmountOnExit={true}
-                                lazyMount={true}
-                                positioning={{ placement: 'top' }}
-                                showArrow
-                                contentProps={{
-                                    css: {
-                                        '--tooltip-bg': colorMode === 'light' ? 'colors.cyan.600' : 'colors.pink.600',
-                                        'color': 'white',
-                                    },
-                                }}
-                            >
-                                <IconButton
-                                    onClick={onToggleVisible}
-                                    borderRadius="full"
-                                    colorScheme="black"
-                                    size="md"
-                                    bg={"transparent"}
-                                    color={colorMode === "light" ? "cyan.600" : "pink.600"}
-                                    position="absolute"
-                                    top="-20px"
-                                    left="-20px"
-                                >
-                                    <IoEyeOff />
-                                </IconButton>
-                            </Tooltip>
+                        <Box 
+                            h="150px" 
+                            w="100%" 
+                            position="relative"
+                            background={coverUrl 
+                                ? `url(${coverUrl}) center/cover no-repeat` 
+                                : "none"
+                            }
+                            bgGradient={!coverUrl ? "to-br" : undefined}
+                            gradientFrom={colorMode === 'light' ? "purple.500":"pink.700"} 
+                            gradientTo={colorMode === 'light' ? "teal.400":"cyan.900"}
+                            backgroundColor={!coverUrl 
+                                ? (colorMode === 'light' ? 'teal.400' : 'pink.600') 
+                                : "transparent"
+                            }
+                        />
 
-                            <Show
-                                when={isOwnProfile}
+                        <Box 
+                            p={7}
+                            mt="-60px"
+                            position="relative"
+                        >
+                            <Flex 
+                                justify="space-between"
+                                position="absolute"
+                                top="-80px"
+                                left="15px"
+                                right="15px"
+                                pointerEvents="none"
                             >
                                 <Tooltip
-                                    content="Edit Profile"
+                                    content="Hide Profile"
                                     openDelay={500}
                                     closeDelay={100}
                                     unmountOnExit={true}
@@ -98,26 +98,56 @@ const ArtistSidebar = ({
                                     showArrow
                                     contentProps={{
                                         css: {
-                                            '--tooltip-bg': colorMode === 'light' ? 'colors.cyan.600' : 'colors.pink.600',
+                                            '--tooltip-bg': colorMode === 'light' ? 'colors.teal.400' : 'colors.pink.600',
                                             'color': 'white',
                                         },
                                     }}
                                 >
                                     <IconButton
+                                        onClick={onToggleVisible}
                                         borderRadius="full"
-                                        colorScheme="black"
-                                        size="md"
-                                        bg={"transparent"}
-                                        color={colorMode === "light" ? "cyan.600" : "pink.600"}
-                                        position="absolute"
-                                        top="-20px"
-                                        right="-20px"
-                                        onClick={goSettings}
+                                        size="sm"
+                                        bg="blackAlpha.600"
+                                        _hover={{ bg: "blackAlpha.800" }}
+                                        color="white"
+                                        pointerEvents="auto"
                                     >
-                                        <FaUserEdit />
+                                        <IoEyeOff />
                                     </IconButton>
                                 </Tooltip>
-                            </Show>
+
+                                <Show
+                                    when={isOwnProfile}
+                                >
+                                    <Tooltip
+                                        content="Edit Profile"
+                                        openDelay={500}
+                                        closeDelay={100}
+                                        unmountOnExit={true}
+                                        lazyMount={true}
+                                        positioning={{ placement: 'top' }}
+                                        showArrow
+                                        contentProps={{
+                                            css: {
+                                                '--tooltip-bg': colorMode === 'light' ? 'colors.teal.400' : 'colors.pink.600',
+                                                'color': 'white',
+                                            },
+                                        }}
+                                    >
+                                        <IconButton
+                                            onClick={goSettings}
+                                            borderRadius="full"
+                                            size="sm"
+                                            bg="blackAlpha.600"
+                                            _hover={{ bg: "blackAlpha.800" }}
+                                            color="white"
+                                            pointerEvents="auto"
+                                        >
+                                            <FaUserEdit />
+                                        </IconButton>
+                                    </Tooltip>
+                                </Show>
+                            </Flex>
 
                             <Stack>
                                 <Box
@@ -126,33 +156,40 @@ const ArtistSidebar = ({
                                     justifyContent="center"
                                     alignItems="center"
                                 >
-                                    <Show
-                                        when={userData && userData.avatar}
-                                        fallback={
-                                            <Icon
-                                                as={ImUser}
-                                                boxSize="300px"
-                                                color={colorMode === 'light' ? 'cyan.100' : 'pink.100'}
-                                                bg={colorMode === 'light' ? 'cyan.600' : 'pink.600'}
-                                                rounded={'full'}
-                                                cursor="pointer"
-                                            />
-                                        }
+                                    <Box 
+                                        borderRadius="full" 
+                                        shadow="md"
                                     >
-                                        <Image
-                                            src={`${BACKEND_URL}/avatars/${userData?.avatar}`}
-                                            alt="Stored Image"
-                                            boxSize="300px"
-                                            borderRadius="full"
-                                            fit="cover"
-                                            cursor="pointer"
-                                        />
-                                    </Show>
+                                        <Show
+                                            when={userData && userData.avatar}
+                                            fallback={
+                                                <Icon
+                                                    as={ImUser}
+                                                    boxSize="200px"
+                                                    color={colorMode === 'light' ? 'teal.100' : 'pink.100'}
+                                                    bgGradient={"to-br"}
+                                                    gradientFrom={colorMode === 'light' ? "purple.500":"pink.700"} 
+                                                    gradientTo={colorMode === 'light' ? "teal.400":"cyan.900"}
+                                                    rounded={'full'}
+                                                />
+                                            }
+                                        >
+                                            <Image
+                                                src={`${BACKEND_URL}/avatars/${userData?.avatar}`}
+                                                alt="Artist Avatar"
+                                                boxSize="200px"
+                                                borderRadius="full"
+                                                fit="cover"
+                                                border="4px solid"
+                                                borderColor={colorMode === 'light' ? 'teal.400' : 'pink.600'}
+                                            />
+                                        </Show>
+                                    </Box>
                                 </Box>
 
                                 <Box
                                     w="100%"
-                                    my={5}
+                                    mt={2}
                                 >
                                     <Text
                                         fontSize={"3xl"} 
@@ -168,16 +205,44 @@ const ArtistSidebar = ({
                                         justifySelf={"center"} 
                                         textAlign={"center"}
                                     >
-                                        {userData?.username}
+                                        @{userData?.username}
                                     </Text>
                                 </Box>
+
+                                <HStack 
+                                    my={3}
+                                >
+                                    <Stat.Root 
+                                        display={"flex"}
+                                        flexDirection={"column"}
+                                        alignItems={"center"}
+                                        justifyContent={"center"}
+                                    >
+                                        <Stat.ValueText>{userStats?.followersCount}</Stat.ValueText>
+                                        <Stat.Label>
+                                            Followers
+                                        </Stat.Label>
+                                    </Stat.Root>
+
+                                    <Stat.Root
+                                        display={"flex"}
+                                        flexDirection={"column"}
+                                        alignItems={"center"}
+                                        justifyContent={"center"}
+                                    >
+                                        <Stat.ValueText>{userStats?.followingCount}</Stat.ValueText>
+                                        <Stat.Label>
+                                            Following
+                                        </Stat.Label>
+                                    </Stat.Root>
+                                </HStack>
 
                                 <Show
                                     when={!isOwnProfile}
                                 >
                                     <Box
                                         w="100%"
-                                        my={5}
+                                        my={2}
                                         display={"flex"}
                                         justifyContent="space-evenly"
                                         alignItems="center"
@@ -186,9 +251,10 @@ const ArtistSidebar = ({
                                             when={!isFollowed}
                                             fallback={
                                                 <Button
-                                                    bg={colorMode == "light" ? "cyan.100":"pink.100"}
-                                                    color={colorMode == "light" ? "cyan.600":"pink.600"}
+                                                    size={"xs"}
                                                     disabled={!user}
+                                                    bg={colorMode == "light" ? "teal.100":"pink.100"}
+                                                    color={colorMode == "light" ? "teal.400":"pink.600"}
                                                     onClick={() => onFollow(false)}
                                                 >
                                                     <PiUserCheckFill /> Following
@@ -196,9 +262,10 @@ const ArtistSidebar = ({
                                             }
                                         >
                                             <Button
-                                                bg={colorMode == "light" ? "cyan.600":"pink.600"}
+                                                size={"xs"}
                                                 color={"white"}
                                                 disabled={!user}
+                                                bg={colorMode == "light" ? "teal.400":"pink.600"}
                                                 onClick={() => onFollow(true)}
                                             >
                                                 <PiUserPlusFill /> Follow
@@ -265,7 +332,7 @@ const ArtistSidebar = ({
                                                 cursor="pointer"
                                                 textDecoration="none"
                                                 _hover={{ textDecoration: "underline" }}
-                                                color={colorMode === "light" ? "cyan.600" : "pink.600"}
+                                                color={colorMode === "light" ? "teal.400" : "pink.600"}
                                                 onClick={onToggleSummary}
                                                 display="flex"
                                                 alignItems="center"

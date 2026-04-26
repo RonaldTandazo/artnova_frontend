@@ -20,10 +20,10 @@ import MultimediaCollector from "@/custom/Components/Artwork/MultimediaCollector
 import { RiCalendarScheduleFill } from "react-icons/ri";
 import MultimediaDialog from "@/custom/Components/Dialogs/MultimediaDialog";
 import { convertBase64ToFile, encodeToBase64 } from "@/utils/Helpers";
-import { SelectOptions } from "@/custom/interfaces/general/GeneralInterfaces";
+import { SelectOptions } from "@/custom/interfaces/General/GeneralInterfaces";
 import { ArtWorkForm, FileInterface, MultimediaFiles } from "@/custom/interfaces/NewArtwork/NewArtwork";
 import ScheduleDrawer from "@/custom/Components/Artwork/NewArtwork/ScheduleDrawer";
-import { DateValue, Time } from "@internationalized/date";
+import { DateValue, getLocalTimeZone, Time } from "@internationalized/date";
 
 const NewArtwork = () => {
     const { storeArtwork: StoreArtwork, data: storeArtworkData, loading: storeArtworkLoading, error: storeArtworkError } = useStoreArtwork();
@@ -119,8 +119,11 @@ const NewArtwork = () => {
         if(user){
             const encodedUserId = encodeToBase64(user.userId);
             const encodedModule = encodeToBase64('OwnProfile');
+
+            const safeUserId = encodeURIComponent(encodedUserId);
+            const safeModule = encodeURIComponent(encodedModule);
                 
-            navigate(`/Profile/${encodedUserId}/${encodedModule}`);
+            navigate(`/Profile/${safeUserId}/${safeModule}`);
         }
     }
 
@@ -252,8 +255,7 @@ const NewArtwork = () => {
             publishing: status,
             schedule: isSchedule,
             publishingTargetStatus: publishingTargetStatus,
-            scheduleDate: data.scheduledDate,
-            scheduleTime: data.scheduledTime
+            scheduleAt: data.scheduleAt
         }
 
         return formData;
@@ -265,7 +267,15 @@ const NewArtwork = () => {
     });
 
     const handleSchedulePost = async (date: DateValue, time: Time) => {
-        const payload = { ...watch(), scheduledDate: date.toString(), scheduledTime: time.toString() };
+        const tz = getLocalTimeZone()
+
+        const jsDate = date.toDate(tz)
+
+        jsDate.setHours(time.hour)
+        jsDate.setMinutes(time.minute)
+        jsDate.setSeconds(time.second ?? 0)
+
+        const payload = { ...watch(), scheduleAt: jsDate.toISOString() };
         const storeData = await structureData('schedule', payload);
         await StoreArtwork(storeData)
     };
@@ -368,7 +378,7 @@ const NewArtwork = () => {
                         backgroundColor="rgba(0, 0, 0, 0.25)"
                         zIndex="tooltip"
                     >
-                        <Spinner size="xl" color={colorMode === "light" ? "cyan.600":"pink.600"} borderWidth="5px"/>
+                        <Spinner size="xl" color={colorMode === "light" ? "teal.400":"pink.600"} borderWidth="5px"/>
                     </Box>
                 </Show>
                 <Box mt={0}>
@@ -377,7 +387,7 @@ const NewArtwork = () => {
                             <Breadcrumb.Item>
                                 <Breadcrumb.Link 
                                     onClick={handleNavigate}
-                                    color={colorMode === "light" ? "cyan.600" : "pink.600"}
+                                    color={colorMode === "light" ? "teal.400" : "pink.600"}
                                     cursor={"pointer"}
                                 >
                                     Profile
@@ -399,8 +409,8 @@ const NewArtwork = () => {
                         >
                             <GridItem>
                                 <Stack gap={10} h={"auto"}>
-                                    <Box border={"solid 1px"} w={"full"} borderRadius={"md"} borderColor={colorMode === "light" ? "cyan.600" : "whiteAlpha.300"} shadow={"lg"}>
-                                        <Box w={"full"} bg={colorMode === "light" ? "cyan.600" : "blackAlpha.500"} py={5} px={10} borderTopRadius={"sm"}>
+                                    <Box border={"solid 1px"} w={"full"} borderRadius={"md"} borderColor={colorMode === "light" ? "teal.400" : "whiteAlpha.300"} shadow={"lg"}>
+                                        <Box w={"full"} bg={colorMode === "light" ? "teal.400" : "blackAlpha.500"} py={5} px={10} borderTopRadius={"sm"}>
                                             <Heading fontSize={"lg"} color={"white"}>Title</Heading>
                                         </Box>
                                         <Stack mx={10} mt={5} mb={10}>
@@ -409,8 +419,8 @@ const NewArtwork = () => {
                                             </Field.Root>
                                         </Stack>
                                     </Box>
-                                    <Box border={"solid 1px"} w={"full"} borderRadius={"md"} borderColor={colorMode === "light" ? "cyan.600" : "whiteAlpha.300"} shadow={"lg"}>
-                                        <Box w={"full"} bg={colorMode === "light" ? "cyan.600" : "blackAlpha.500"} py={5} px={10} borderTopRadius={"sm"}>
+                                    <Box border={"solid 1px"} w={"full"} borderRadius={"md"} borderColor={colorMode === "light" ? "teal.400" : "whiteAlpha.300"} shadow={"lg"}>
+                                        <Box w={"full"} bg={colorMode === "light" ? "teal.400" : "blackAlpha.500"} py={5} px={10} borderTopRadius={"sm"}>
                                             <Heading fontSize={"lg"} color={"white"}>Details</Heading>
                                         </Box>
                                         <Stack mx={10} mt={5} mb={10} gap={10}>
@@ -422,7 +432,7 @@ const NewArtwork = () => {
                                                 <Field.Label fontSize={"lg"}>Mature Content</Field.Label>
                                                 <Checkbox.Root
                                                     variant={"solid"}
-                                                    colorPalette={colorMode === "light" ? "cyan" : "pink"}
+                                                    colorPalette={colorMode === "light" ? "teal.400" : "pink"}
                                                     onCheckedChange={(e) => setMatureContent(e.checked === true)}
                                                     checked={matureContent}
                                                     cursor="pointer"
@@ -434,8 +444,8 @@ const NewArtwork = () => {
                                             </Field.Root>
                                         </Stack>
                                     </Box>
-                                    <Box border={"solid 1px"} w={"full"} borderRadius={"md"} borderColor={colorMode === "light" ? "cyan.600" : "whiteAlpha.300"} shadow={"lg"}>
-                                        <Box w={"full"} bg={colorMode === "light" ? "cyan.600" : "blackAlpha.500"} py={5} px={10} borderTopRadius={"sm"}>
+                                    <Box border={"solid 1px"} w={"full"} borderRadius={"md"} borderColor={colorMode === "light" ? "teal.400" : "whiteAlpha.300"} shadow={"lg"}>
+                                        <Box w={"full"} bg={colorMode === "light" ? "teal.400" : "blackAlpha.500"} py={5} px={10} borderTopRadius={"sm"}>
                                             <Heading fontSize={"lg"} color={"white"}>Categoritzation</Heading>
                                         </Box>
                                         <Stack mx={10} mt={5} mb={10} gap={10}>
@@ -455,7 +465,7 @@ const NewArtwork = () => {
                                                             <CheckboxCard.Root
                                                                 key={item.value}
                                                                 variant={"outline"}
-                                                                colorPalette={colorMode === "light" ? "cyan" : "pink"}
+                                                                colorPalette={colorMode === "light" ? "teal.400" : "pink"}
                                                                 onCheckedChange={() => handleCategoryChange(Number(item.value))}
                                                                 checked={selectedCategories.includes(Number(item.value))}
                                                                 cursor="pointer"
@@ -490,14 +500,14 @@ const NewArtwork = () => {
                                                     >
                                                         <For each={selectedTopic}>
                                                             {(item) => (
-                                                                <Card.Root size="sm" key={item.value} borderWidth={"2px"} borderColor={colorMode === "light" ? "cyan.600":"pink.600"}>
+                                                                <Card.Root size="sm" key={item.value} borderWidth={"2px"} borderColor={colorMode === "light" ? "teal.400":"pink.600"}>
                                                                     <Card.Body display={"flex"} justifyContent={"center"}>
                                                                         <Flex justifyContent={"space-between"} alignItems={"center"}>
                                                                             <Heading size="sm">{item.label}</Heading>
                                                                             <IconButton 
                                                                                 onClick={() => handleTopicChange(item, "remove")} 
                                                                                 size={"2xs"} 
-                                                                                bg={colorMode === "light" ? "cyan.600":"pink.600"}   
+                                                                                bg={colorMode === "light" ? "teal.400":"pink.600"}   
                                                                                 color={"white"} 
                                                                                 justifyContent={"center"}
                                                                                 alignItems={"center"}
@@ -534,14 +544,14 @@ const NewArtwork = () => {
                                                     >
                                                         <For each={selectedSoftware}>
                                                             {(item) => (
-                                                                <Card.Root size="sm" key={item.value} borderWidth={"2px"} borderColor={colorMode === "light" ? "cyan.600":"pink.600"}>
+                                                                <Card.Root size="sm" key={item.value} borderWidth={"2px"} borderColor={colorMode === "light" ? "teal.400":"pink.600"}>
                                                                     <Card.Body display={"flex"} justifyContent={"center"}>
                                                                         <Flex justifyContent={"space-between"} alignItems={"center"}>
                                                                             <Heading size="sm">{item.label}</Heading>
                                                                             <IconButton 
                                                                                 onClick={() => handleSoftwareChange(item, "remove")} 
                                                                                 size={"2xs"} 
-                                                                                bg={colorMode === "light" ? "cyan.600":"pink.600"}   
+                                                                                bg={colorMode === "light" ? "teal.400":"pink.600"}   
                                                                                 color={"white"} 
                                                                                 justifyContent={"center"}
                                                                                 alignItems={"center"}
@@ -560,8 +570,8 @@ const NewArtwork = () => {
                                             </Box>
                                         </Stack>
                                     </Box>
-                                    <Box border={"solid 1px"} w={"full"} borderRadius={"md"} borderColor={colorMode === "light" ? "cyan.600" : "whiteAlpha.300"} shadow={"lg"}>
-                                        <Box w={"full"} bg={colorMode === "light" ? "cyan.600" : "blackAlpha.500"} py={5} px={10} borderTopRadius={"sm"}>
+                                    <Box border={"solid 1px"} w={"full"} borderRadius={"md"} borderColor={colorMode === "light" ? "teal.400" : "whiteAlpha.300"} shadow={"lg"}>
+                                        <Box w={"full"} bg={colorMode === "light" ? "teal.400" : "blackAlpha.500"} py={5} px={10} borderTopRadius={"sm"}>
                                             <Heading fontSize={"lg"} color={"white"}>Multimedia</Heading>
                                         </Box>
                                         <Stack mx={10} mt={5} mb={10} gap={10}>
@@ -584,9 +594,9 @@ const NewArtwork = () => {
                                                                 _selected={{
                                                                     borderLeft: "4px solid",
                                                                     borderLeftColor:
-                                                                        colorMode === "light" ? "cyan.600" : "pink.600",
+                                                                        colorMode === "light" ? "teal.400" : "pink.600",
                                                                     backgroundColor:
-                                                                        colorMode === "light" ? "cyan.50" : "pink.200",
+                                                                        colorMode === "light" ? "teal.400.50" : "pink.200",
                                                                     color: "black",
                                                                 }}
                                                                 rounded={"sm"}
@@ -606,7 +616,7 @@ const NewArtwork = () => {
                                                                 >
                                                                     <Icon
                                                                         size={"md"}
-                                                                        color={colorMode === "light" ? "cyan.600" : "pink.600"}
+                                                                        color={colorMode === "light" ? "teal.400" : "pink.600"}
                                                                     >
                                                                         {tab.icon}
                                                                     </Icon>
@@ -647,8 +657,8 @@ const NewArtwork = () => {
                             </GridItem>
                             <GridItem>
                                 <Stack gap={10} h={"auto"}>
-                                    <Box border={"solid 1px"} w={"full"} borderRadius={"md"} borderColor={colorMode === "light" ? "cyan.600" : "whiteAlpha.300"} shadow={"lg"}>
-                                        <Box w={"full"} bg={colorMode === "light" ? "cyan.600" : "blackAlpha.500"} py={5} px={10} borderTopRadius={"sm"}>
+                                    <Box border={"solid 1px"} w={"full"} borderRadius={"md"} borderColor={colorMode === "light" ? "teal.400" : "whiteAlpha.300"} shadow={"lg"}>
+                                        <Box w={"full"} bg={colorMode === "light" ? "teal.400" : "blackAlpha.500"} py={5} px={10} borderTopRadius={"sm"}>
                                             <Heading fontSize={"lg"} color={"white"}>Thumbnail</Heading>
                                         </Box>
                                         <Stack mx={10} mt={5} mb={10}>
@@ -689,14 +699,14 @@ const NewArtwork = () => {
                                                     </Box>
                                                     <Box w={"full"} h={"full"} display={"flex"} justifyContent={"space-between"}  alignItems={"center"} mt={3}>
                                                         <Button
-                                                            bg={colorMode === "light" ? "cyan.600":"pink.600"}
+                                                            bg={colorMode === "light" ? "teal.400":"pink.600"}
                                                             color={"whiteAlpha.950"}
                                                             onClick={handleCrop}
                                                         >
                                                             <FaCropSimple /> Crop
                                                         </Button>
                                                         <Button 
-                                                            bg={colorMode === "light" ? "cyan.600":"pink.600"}
+                                                            bg={colorMode === "light" ? "teal.400":"pink.600"}
                                                             color={"whiteAlpha.950"}
                                                             onClick={resetThumbnail}
                                                         > 
@@ -707,8 +717,8 @@ const NewArtwork = () => {
                                             </Field.Root>
                                         </Stack>
                                     </Box>
-                                    <Box border={"solid 1px"} w={"full"} borderRadius={"md"} borderColor={colorMode === "light" ? "cyan.600" : "whiteAlpha.300"} shadow={"lg"}>
-                                        <Box w={"full"} bg={colorMode === "light" ? "cyan.600" : "blackAlpha.500"} py={5} px={10} borderTopRadius={"sm"}>
+                                    <Box border={"solid 1px"} w={"full"} borderRadius={"md"} borderColor={colorMode === "light" ? "teal.400" : "whiteAlpha.300"} shadow={"lg"}>
+                                        <Box w={"full"} bg={colorMode === "light" ? "teal.400" : "blackAlpha.500"} py={5} px={10} borderTopRadius={"sm"}>
                                             <Heading fontSize={"lg"} color={"white"}>Publishing</Heading>
                                         </Box>
                                         <Stack mx={10} mt={5} mb={10}>
@@ -734,7 +744,7 @@ const NewArtwork = () => {
                                                         <Button 
                                                             variant="outline" 
                                                             size="sm"
-                                                            bg={colorMode === "light" ? "cyan.600":"pink.600"}
+                                                            bg={colorMode === "light" ? "teal.400":"pink.600"}
                                                             color={"whiteAlpha.950"}
                                                             maxW={"45%"}
                                                             onClick={() => setOpenDrawer(true)}
@@ -745,7 +755,7 @@ const NewArtwork = () => {
                                                     </Show>
                                                     <Spacer/>
                                                     <Button
-                                                        bg={colorMode === "light" ? "cyan.600":"pink.600"}
+                                                        bg={colorMode === "light" ? "teal.400":"pink.600"}
                                                         color={"whiteAlpha.950"}
                                                         type="submit"
                                                         maxW={"45%"}
@@ -758,7 +768,7 @@ const NewArtwork = () => {
                                                 >
                                                     <Spacer/>
                                                     <Button
-                                                        bg={colorMode === "light" ? "cyan.600":"pink.600"}
+                                                        bg={colorMode === "light" ? "teal.400":"pink.600"}
                                                         color={"whiteAlpha.950"}
                                                         onClick={handleSaveDraft}
                                                     >

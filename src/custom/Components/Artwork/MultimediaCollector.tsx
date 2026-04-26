@@ -182,7 +182,7 @@ const MultimediaCollector = ({ type, onUpdate, files, onError }: any) => {
                             display={"flex"}
                             alignItems={"center"}
                             justifyContent={"center"}
-                            bg={colorMode === 'light' ? 'cyan.600' : 'pink.600'}
+                            bg={colorMode === 'light' ? 'teal.400' : 'pink.600'}
                             color={'whiteAlpha.950'}
                             onMouseEnter={() => handleHover(index, true)}
                             onMouseLeave={() => handleHover(index, false)}
@@ -228,7 +228,7 @@ const MultimediaCollector = ({ type, onUpdate, files, onError }: any) => {
                                         showArrow
                                         contentProps={{ 
                                             css: { 
-                                                "--tooltip-bg": colorMode === "light" ? "colors.cyan.600":"colors.pink.600",
+                                                "--tooltip-bg": colorMode === "light" ? "colors.teal.400":"colors.pink.600",
                                                 'color': 'white'
                                             }
                                         }}
@@ -259,7 +259,7 @@ const MultimediaCollector = ({ type, onUpdate, files, onError }: any) => {
                                     showArrow
                                     contentProps={{ 
                                         css: { 
-                                            "--tooltip-bg": colorMode === "light" ? "colors.cyan.600":"colors.pink.600",
+                                            "--tooltip-bg": colorMode === "light" ? "colors.teal.400":"colors.pink.600",
                                             'color': 'white'
                                         }
                                     }}

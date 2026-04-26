@@ -61,8 +61,9 @@ const ArtistMessage = ({ artist, user, openChat, onToggleChat }: ArtistMessagePr
         <Drawer.Root open={openChat} onOpenChange={onToggleChat} placement={"start"} size={"xl"}>
             <Drawer.Trigger asChild>
                 <Button
-                    bg={colorMode == "light" ? "black":"white"}
+                    size={"xs"}
                     disabled={!user}
+                    bg={colorMode == "light" ? "black":"white"}
                 >
                     <IoMdChatbubbles /> Message
                 </Button>
@@ -73,7 +74,7 @@ const ArtistMessage = ({ artist, user, openChat, onToggleChat }: ArtistMessagePr
                     <Drawer.Content>
                         <Drawer.Header
                             color={'white'}
-                            bg={colorMode == 'light' ? 'cyan.600':'pink.600'}
+                            bg={colorMode == 'light' ? 'teal.400':'pink.600'}
                         >
                             <Drawer.Title>
                                 <Box 
@@ -122,7 +123,7 @@ const ArtistMessage = ({ artist, user, openChat, onToggleChat }: ArtistMessagePr
                                 endElement={
                                     <IconButton 
                                         bg={"transparent"}
-                                        color={colorMode == "light" ? "cyan.600":"pink.600"}
+                                        color={colorMode == "light" ? "teal.400":"pink.600"}
                                         rounded={"full"}
                                         disabled={!user || message.trim() === ""}
                                         size={"xs"}
@@ -136,7 +137,7 @@ const ArtistMessage = ({ artist, user, openChat, onToggleChat }: ArtistMessagePr
                                     value={message}
                                     placeholder="Type your message..."
                                     color={colorMode === "light" ? "black" : "white"}
-                                    borderColor={colorMode === "light" ? "cyan.600" : "pink.600"}
+                                    borderColor={colorMode === "light" ? "teal.400" : "pink.600"}
                                     onChange={(e) => setMessage(e.target.value)}
                                     onKeyDown={handleKeyDown}
                                 />
@@ -147,8 +148,8 @@ const ArtistMessage = ({ artist, user, openChat, onToggleChat }: ArtistMessagePr
                             <CloseButton 
                                 size="sm"
                                 bg={colorMode == 'light' ? 'white':'black'}
-                                color={colorMode == 'light' ? 'cyan.600':'white'}
-                                borderColor={colorMode == 'light' ? 'cyan.600':'white'} 
+                                color={colorMode == 'light' ? 'teal.400':'white'}
+                                borderColor={colorMode == 'light' ? 'teal.400':'white'} 
                             />
                         </Drawer.CloseTrigger>
                     </Drawer.Content>

@@ -1,4 +1,4 @@
-import { Notification } from "../general/GeneralInterfaces";
+import { Notification } from "../General/GeneralInterfaces";
 
 export interface ProfileChangePasswordProps{
     resetAlert: () => void; 

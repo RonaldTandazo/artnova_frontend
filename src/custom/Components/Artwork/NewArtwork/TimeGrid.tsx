@@ -1,6 +1,6 @@
 import { useColorMode } from "@/components/ui/color-mode";
 import { TimeGridProps } from "@/custom/interfaces/NewArtwork/ScheduleDrawer";
-import { Button, For, Stack } from "@chakra-ui/react";
+import { Button, For, Show, Stack, Text } from "@chakra-ui/react";
 
 export const TimeGrid = ({ 
     slots, 
@@ -12,35 +12,44 @@ export const TimeGrid = ({
     
     return (
         <Stack gap="2" px="4" pb="4" flex="1" overflowY="auto" maxH="500px">
-            <For
-                each={slots}
+            <Show
+                when={slots.length > 0}
+                fallback={
+                    <Text textAlign="center" color="fg.muted">
+                        No available times for today
+                    </Text>
+                }
             >
-                {(time) => {
-                    const label = formatTime(time);
-                    const isSelected = selectedTime != null && selectedTime.compare(time) === 0;
+                <For
+                    each={slots}
+                >
+                    {(time) => {
+                        const label = formatTime(time);
+                        const isSelected = selectedTime != null && selectedTime.compare(time) === 0;
 
-                    return (
-                        <Button
-                            key={label}
-                            size="sm"
-                            rounded="lg"
-                            fontWeight="normal"
-                            onClick={() => onTimeClick(time)}
-                            bg={isSelected
-                                ? (colorMode === "light" ? "cyan.600" : "pink.600")
-                                : (colorMode === "light" ? "white" : "black")
-                            }
-                            color={isSelected
-                                ? ("white")
-                                : (colorMode === "light" ? "black" : "white")
-                            }
-                            borderColor={isSelected ? "white" : "black"}
-                        >
-                            {label}
-                        </Button>
-                    );
-                }}
-            </For>
+                        return (
+                            <Button
+                                key={label}
+                                size="sm"
+                                rounded="lg"
+                                fontWeight="normal"
+                                onClick={() => onTimeClick(time)}
+                                bg={isSelected
+                                    ? (colorMode === "light" ? "teal.400" : "pink.600")
+                                    : (colorMode === "light" ? "white" : "black")
+                                }
+                                color={isSelected
+                                    ? ("white")
+                                    : (colorMode === "light" ? "black" : "white")
+                                }
+                                borderColor={isSelected ? "white" : "black"}
+                            >
+                                {label}
+                            </Button>
+                        );
+                    }}
+                </For>
+            </Show>
         </Stack>
     );
 };

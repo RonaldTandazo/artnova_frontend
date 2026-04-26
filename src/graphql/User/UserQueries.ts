@@ -14,6 +14,16 @@ export const GET_USER_DATA = gql`
             avatar
             since
             chatId
+            cover
+        }
+    }
+`;
+
+export const GET_USER_STATS_DATA = gql`
+    query GetUserStats($userId: Int) {
+        getUserStats(userId: $userId) {
+            followersCount
+            followingCount
         }
     }
 `;

@@ -10,7 +10,7 @@ import { useGetCountry } from "@/services/Country/CountryService";
 import { useGetSocialMedia } from "@/services/SocialMedia/SocialMediaService";
 import { GrNodes } from "react-icons/gr";
 import { useGetSkillsData } from "@/services/UserSkills/UserSkillService";
-import { Notification, SelectOptions } from "@/custom/interfaces/general/GeneralInterfaces";
+import { Notification, SelectOptions } from "@/custom/interfaces/General/GeneralInterfaces";
 import ProfileInformation from "@/custom/Components/ProfileSettings/ProfileInformation";
 import SkillsInterests from "@/custom/Components/ProfileSettings/ProfileSkillsInterests";
 import ProfilePicture from "@/custom/Components/ProfileSettings/ProfilePIcture";
@@ -199,9 +199,15 @@ const ProfileSettings = () => {
             alignItems={"center"}
             justifyContent={"center"}
         >
-            <Grid w={"75vw"} templateColumns="35% 65%" p={10} h={"100%"}>
+            <Grid 
+                w={"75vw"}
+                templateColumns="35% 65%"
+                p={10}
+                h={"100%"}
+                gap={2}
+            >
                 <ProfilePicture 
-                    user={user}
+                    user={user!}
                     resetAlert={resetAlert}
                     handleNotification={handleNotification}
                     updateUser={updateUser}
@@ -229,9 +235,9 @@ const ProfileSettings = () => {
                                         _selected={{
                                             borderLeft: "4px solid",
                                             borderLeftColor:
-                                                colorMode === "light" ? "cyan.600" : "pink.600",
+                                                colorMode === "light" ? "teal.400" : "pink.600",
                                             backgroundColor:
-                                                colorMode === "light" ? "cyan.50" : "pink.200",
+                                                colorMode === "light" ? "teal.400.50" : "pink.200",
                                             color: "black",
                                         }}
                                         rounded={"xs"}
@@ -250,7 +256,7 @@ const ProfileSettings = () => {
                                         >
                                             <Icon
                                                 size={"md"}
-                                                color={colorMode === "light" ? "cyan.600" : "pink.600"}
+                                                color={colorMode === "light" ? "teal.400" : "pink.600"}
                                             >
                                                 {item.icon}
                                             </Icon>

@@ -11,7 +11,7 @@ import { useSubscription } from "@apollo/client/react";
 import { NEW_ARTWORK_SUBSCRIPTION } from "@/graphql/Artwork/ArtworkSubscription";
 import LoadingProgress from "@/custom/Components/States/LoadingProgress";
 import { decodeFromBase64, encodeToBase64 } from "@/utils/Helpers";
-import { useGetUserData } from "@/services/User/UserService";
+import { useGetUserData, useGetUserStatsData } from "@/services/User/UserService";
 import { GeneralInfoInterface } from "@/graphql/User/UserInterfaces";
 import { useGetFollowState, useSetFollowState, useUnsetFollowState } from "@/services/Follow/FollowService";
 import ArtistSidebar from "@/custom/Components/Profile/ArtistSidebar";
@@ -19,6 +19,7 @@ import ArtistContent from "@/custom/Components/Profile/ArtistContent";
 import { GetArtworksWS } from "@/custom/interfaces/Profile/Profile";
 import { Artwork } from "@/custom/interfaces/Profile/ArtistContent";
 import { UserSocialMedia } from "@/custom/interfaces/ProfileSettings/ProfileSocialMedia";
+import { UserStats } from "@/custom/interfaces/General/GeneralInterfaces";
 
 const Profile = () => {
     const navigate = useNavigate();
@@ -34,13 +35,15 @@ const Profile = () => {
     const [openMenuId, setOpenMenuId] = useState<number | undefined>(undefined);
     const [isOwnProfile, setIsOwnProfile] = useState<boolean>(true)
     const [userData, setUserData] = useState<GeneralInfoInterface | undefined>(undefined)
+    const [userStats, setUserStats] = useState<UserStats | undefined>(undefined)
     const [isFollowed, setIsFollowed] = useState<boolean>(false)
     
     const { getUserSocialMedia, data: userSocialMediaData, loading: userSocialMediaLoading } = useGetUserSocialMedia();
     const { getUserArtworks, data: userArtworksData, loading: userArtworksLoading } = useGetUserArtworks();
     const { deleteUserArtworks } = useDeleteUserArtworks();
-    const { getUserGeneralData, data: userGeneralData } = useGetUserData();
+    const { getUserStats, data: userStatsData } = useGetUserStatsData();
     const { getFollowState, data: followStateData } = useGetFollowState();
+    const { getUserGeneralData, data: userGeneralData } = useGetUserData();
     const { setFollowState } = useSetFollowState();
     const { unsetFollowState } = useUnsetFollowState();
     const { data } = useSubscription<GetArtworksWS>(NEW_ARTWORK_SUBSCRIPTION);
@@ -83,6 +86,7 @@ const Profile = () => {
                 }
             }
             
+            getUserStats(moduleDecoded != 'OwnProfile' ? userId : undefined)
             getUserArtworks(searchData)
             getUserSocialMedia(searchData);
         }
@@ -93,6 +97,12 @@ const Profile = () => {
             setUserData(userGeneralData.getUserGeneralData)
         }
     }, [userGeneralData, isOwnProfile])
+
+    useEffect(() => {
+        if(userStatsData && userStatsData.getUserStats){
+            setUserStats(userStatsData.getUserStats)
+        }
+    }, [userStatsData])
 
     useEffect(() => {
         if(!isOwnProfile && followStateData && followStateData.getFollowState){
@@ -114,7 +124,6 @@ const Profile = () => {
                 
                 setArtworks(filterArtworks)
             }else{
-                console.log(userArtworksData.getUserArtworks)
                 setArtworks(userArtworksData.getUserArtworks)
             }
 
@@ -124,7 +133,7 @@ const Profile = () => {
 
     useEffect(() => {
         if (data && data.newArtwork) {
-            const newArtwork: Artwork = data.newArtwork.artwork;
+            const newArtwork = data.newArtwork.artwork;
             setArtworks((prevArtworks) => [...prevArtworks, newArtwork]);
         }
     }, [data]);
@@ -133,8 +142,11 @@ const Profile = () => {
         if (user && isOwnProfile) {
             const encodedUserId = encodeToBase64(user.userId);
             const encodedModule = encodeToBase64('ProfileSettings');
+
+            const safeUserId = encodeURIComponent(encodedUserId);
+            const safeModule = encodeURIComponent(encodedModule);
             
-            navigate(`/ProfileSettings/${encodedUserId}/${encodedModule}`)
+            navigate(`/ProfileSettings/${safeUserId}/${safeModule}`)
         }
     }
 
@@ -143,7 +155,10 @@ const Profile = () => {
             const encodedUserId = encodeToBase64(user.userId);
             const encodedModule = encodeToBase64('NewArtwork');
 
-            navigate(`/ArtWorks/New/${encodedUserId}/${encodedModule}`)
+            const safeUserId = encodeURIComponent(encodedUserId);
+            const safeModule = encodeURIComponent(encodedModule);
+
+            navigate(`/ArtWorks/New/${safeUserId}/${safeModule}`)
         }
     }
 
@@ -154,7 +169,8 @@ const Profile = () => {
     const handleFollowState = (state: boolean) => {
         if(!isOwnProfile && user && userData){
             const data = {
-                followedId: userData.userId
+                followedId: userData.userId,
+                simple: true
             }
     
             if(state){
@@ -200,7 +216,8 @@ const Profile = () => {
                         isOwnProfile = {isOwnProfile}
                         userSocialMedia = {userSocialMedia}
                         shouldExpand = {shouldExpand}
-                        userData= {userData}
+                        userData = {userData}
+                        userStats = {userStats}
                         isFollowed = {isFollowed}
                         user = {user}
                         truncatedSummary = {truncatedSummary}
@@ -230,7 +247,7 @@ const Profile = () => {
                             showArrow
                             contentProps={{
                                 css: {
-                                    '--tooltip-bg': colorMode === 'light' ? 'colors.cyan.600' : 'colors.pink.600',
+                                    '--tooltip-bg': colorMode === 'light' ? 'colors.teal.400' : 'colors.pink.600',
                                     'color': 'white',
                                 },
                             }}
@@ -244,7 +261,7 @@ const Profile = () => {
                                 shadow="md"
                                 borderRadius="full"
                                 bg={colorMode === "light" ? "black" : "white"}
-                                color={colorMode === "light" ? "pink.600" : "cyan.600"}
+                                color={colorMode === "light" ? "pink.600" : "teal.400"}
                                 left="20px"
                                 bottom="75px"
                                 zIndex="tooltip"

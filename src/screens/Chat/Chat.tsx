@@ -24,7 +24,7 @@ const Chat = () => {
             overflow="hidden"
             borderRadius={4}
             border={"1px solid"}
-            borderColor={colorMode == 'light' ? 'cyan.600':"pink.600"}
+            borderColor={colorMode == 'light' ? 'teal.400':"pink.600"}
             shadow={"2xl"}
         >
             <ChatSidebar

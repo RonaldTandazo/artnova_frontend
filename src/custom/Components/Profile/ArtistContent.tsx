@@ -33,7 +33,7 @@ const ArtistContent = ({
                         >
                             <Button
                                 size="sm"
-                                bg={colorMode === "light" ? "cyan.600" : "pink.600"}
+                                bg={colorMode === "light" ? "teal.400" : "pink.600"}
                                 color={"white"}
                                 shadow={"md"}
                                 onClick={onNewArt}
@@ -55,8 +55,8 @@ const ArtistContent = ({
                             when={artworks && artworks.length > 0} 
                             fallback={
                                 <Empty
-                                    title="Oooh no!...It seems that no ArtWorks created yet 😢"
-                                    default_description={false}
+                                    title="No ArtWorks Created Yet"
+                                    description="Oooh no!...It seems that no ArtWorks created yet 😢"
                                 />
                             }
                         >

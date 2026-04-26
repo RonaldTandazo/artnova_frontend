@@ -1,8 +1,9 @@
-import { type DateValue, Time, getLocalTimeZone } from "@internationalized/date"
+import { Time } from "@internationalized/date"
 
 export const BACKEND_URL = import.meta.env.VITE_API_URL;
 export const CHAT_LIMIT = Number(import.meta.env.VITE_CHAT_LIMIT);
 export const MESSAGES_LIMIT = Number(import.meta.env.VITE_MESSAGES_LIMIT);
+export const WS_URL = import.meta.env.VITE_WS_URL
 
 export const DATE_OPTIONS = {
   year: 'numeric',
@@ -68,6 +69,14 @@ export const formatDate = (date: Date, withDate: Boolean = true, withTime: Boole
     return `${y}-${m}-${d} ${h}:${i}:${s}`;
 };
 
+export const formatSchedule = (dateString?: string) => {
+    if (!dateString) return ""
+
+    return new Intl.DateTimeFormat(undefined, {
+        dateStyle: "medium",
+        timeStyle: "short"
+    }).format(new Date(dateString))
+}
 
 export const generateTimeSlots = (
     intervalMinutes: number = 30

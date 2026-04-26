@@ -1,5 +1,5 @@
 import { GeneralInfoInterface } from "@/graphql/User/UserInterfaces"
-import { User } from "../general/GeneralInterfaces"
+import { User, UserStats } from "../General/GeneralInterfaces"
 import { UserSocialMedia } from "../ProfileSettings/ProfileSocialMedia";
 
 export interface ArtistSidebarProps {
@@ -11,6 +11,7 @@ export interface ArtistSidebarProps {
     userSocialMedia: UserSocialMedia[] | undefined;
     shouldExpand: boolean;
     userData: GeneralInfoInterface | undefined;
+    userStats: UserStats | undefined;
     isFollowed: boolean;
     user: User | undefined;
     truncatedSummary: string | undefined;

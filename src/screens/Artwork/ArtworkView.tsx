@@ -1,13 +1,12 @@
 import { useColorMode } from '@/components/ui/color-mode';
 import { useAuth } from '@/context/AuthContext';
-import ArtVerseGrid from '@/custom/Components/ArtVerse/ArtVerseGrid';
 import CarouselViewer from '@/custom/Components/Artwork/ArtworkView/CarouselViewer';
 import LoadingProgress from '@/custom/Components/States/LoadingProgress';
 import Empty from '@/custom/Components/States/Empty';
 import { useGetArtworkDetails } from '@/services/Artwork/ArtworkService';
 import { useDeleteArtworkComment, useGetArtworkStatistics, usePostArtworkComment, useStoreArtworkViews, useUpdateArtworkDisLikes, useUpdateArtworkFavorites, useUpdateArtworkLikes, useUpdateCommentDisLikes, useUpdateCommentLikes } from '@/services/ArtworkStatistics/ArtworkStatisticsService';
 import { decodeFromBase64, encodeToBase64 } from '@/utils/Helpers';
-import { Box, Grid, GridItem, Show } from '@chakra-ui/react';
+import { Box, Grid, GridItem, Show, Stack } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import InformationPanel from '@/custom/Components/Artwork/ArtworkView/InformationPanel';
@@ -18,7 +17,7 @@ import ArtworkComments from '@/custom/Components/Artwork/ArtworkView/ArtworkComm
 const ArtworkView = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
-    const { artworkId } = useParams();
+    const { value: artworkId } = useParams();
     const { colorMode } = useColorMode();
     const [loading, setLoading] = useState<boolean>(true);
     const [artworkData, setArtworkData] = useState<ArtworkInformation | undefined>(undefined);
@@ -221,8 +220,11 @@ const ArtworkView = () => {
         if(userId){
             const encodedUserId = encodeToBase64(userId);
             const encodedModule = encodeToBase64(user && userId == user.userId ? 'OwnProfile':'VisitProfile');
+
+            const safeUserId = encodeURIComponent(encodedUserId);
+            const safeModule = encodeURIComponent(encodedModule);
             
-            return `/Profile/${encodedUserId}/${encodedModule}`
+            return `/Profile/${safeUserId}/${safeModule}`
         }
 
         return '#';
@@ -244,7 +246,7 @@ const ArtworkView = () => {
                                 title = "Oooh no!... There's no information about the ArtWork you selected 😢"
                                 description = "Don't worry, there are many other amazing Arts for you to discover!"
                             />
-                            <ArtVerseGrid />
+                            {/* <ArtVerseGrid /> */}
                         </>
                     }
                 >
@@ -255,60 +257,52 @@ const ArtworkView = () => {
                     >
                         {/* 1. Contenido Principal (Scrollable) */}
                         <GridItem>
-                            <Box 
-                                minH="600px" 
-                                p={5} 
+                            <Stack 
+                                p={5}
                                 mb={5}
+                                gap={15}
+                                minH={"600px"} 
+                                justify={"center"}
                                 bg={colorMode === 'light' ? "whiteAlpha.950" : "blackAlpha.500"}
                             >
-                                <Box>
-                                    <Box 
-                                        display={"flex"} 
-                                        flexDirection={"column"} 
-                                        // p={5}
-                                        gap={15}
+                                <Show
+                                    when={artworkData && (artworkData.images.length > 0 || artworkData.videos.length > 0)}
+                                    fallback={
+                                        <Empty
+                                            title="No Multimedia Posted Yet"
+                                        />
+                                    }
+                                >
+                                    <Show
+                                        when={artworkData?.images && artworkData.images.length > 0}
                                     >
-                                        <Show
-                                            when={artworkData && (artworkData.images.length > 0 || artworkData.videos.length > 0)}
-                                            fallback={
-                                                <Empty
-                                                    title="No Multimedia Posted Yet"
-                                                    default_description={false}
-                                                />
-                                            }
+                                        <Box  
+                                            p={3}
+                                            w={"full"} 
+                                            h={"1000px"} 
+                                            maxH={"1250px"} 
+                                            borderRadius={4} 
+                                            shadow={"md"}
                                         >
-                                            <Show
-                                                when={artworkData?.images && artworkData.images.length > 0}
-                                            >
-                                                <Box  
-                                                    p={3}
-                                                    w={"full"} 
-                                                    h={"1000px"} 
-                                                    maxH={"1250px"} 
-                                                    borderRadius={4} 
-                                                    shadow={"md"}
-                                                >
-                                                    <CarouselViewer type="images" files={artworkData ? artworkData.images:[]}/>
-                                                </Box>
-                                            </Show>
-                                            <Show
-                                                when={artworkData?.videos && artworkData.videos.length > 0}
-                                            >
-                                                <Box 
-                                                    p={3}
-                                                    w={"full"} 
-                                                    h={"1000px"} 
-                                                    maxH={"1250px"} 
-                                                    borderRadius={4} 
-                                                    shadow={"md"}
-                                                >
-                                                    <CarouselViewer type="videos" files={artworkData ? artworkData.videos:[]} />
-                                                </Box>
-                                            </Show>
-                                        </Show>
-                                    </Box>
-                                </Box>
-                            </Box>
+                                            <CarouselViewer type="images" files={artworkData ? artworkData.images:[]}/>
+                                        </Box>
+                                    </Show>
+                                    <Show
+                                        when={artworkData?.videos && artworkData.videos.length > 0}
+                                    >
+                                        <Box 
+                                            p={3}
+                                            w={"full"} 
+                                            h={"1000px"} 
+                                            maxH={"1250px"} 
+                                            borderRadius={4} 
+                                            shadow={"md"}
+                                        >
+                                            <CarouselViewer type="videos" files={artworkData ? artworkData.videos:[]} />
+                                        </Box>
+                                    </Show>
+                                </Show>
+                            </Stack>
 
                             <ArtworkComments 
                                 user={user}

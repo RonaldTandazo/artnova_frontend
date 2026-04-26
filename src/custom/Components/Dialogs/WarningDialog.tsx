@@ -25,7 +25,7 @@ const WarningDialog = ({
                 <Dialog.Backdrop />
                 <Dialog.Positioner>
                     <Dialog.Content>
-                        <Dialog.Header bg={colorMode === "light" ? "cyan.600":"blackAlpha.500"}>
+                        <Dialog.Header bg={colorMode === "light" ? "teal.400":"blackAlpha.500"}>
                             <Dialog.Title>
                                 <HStack
                                     justifyContent={"flex-start"}
@@ -34,8 +34,11 @@ const WarningDialog = ({
                                     <Icon
                                         as={IoIosWarning}
                                         size={"xl"}
+                                        color={"whiteAlpha.950"}
                                     />
-                                    <Text>
+                                    <Text
+                                        color={"whiteAlpha.950"}
+                                    >
                                         {title}
                                     </Text>
                                 </HStack>
@@ -92,9 +95,9 @@ const WarningDialog = ({
                         <Dialog.Footer>
                             <Dialog.ActionTrigger asChild>
                                 <Button
-                                    color={colorMode == 'light' ? 'cyan.600':'white'}
+                                    color={colorMode == 'light' ? 'teal.400':'white'}
                                     bg={colorMode == 'light' ? 'white':'black'}
-                                    borderColor={colorMode == 'light' ? 'cyan.600':'white'}
+                                    borderColor={colorMode == 'light' ? 'teal.400':'white'}
                                     onClick={onClose}
                                 >
                                     <MdCancel /> No, Cancel

@@ -15,36 +15,40 @@ import ArtworkEdit from '@/screens/Artwork/ArtworkEdit';
 import Viewer from '@/screens/Artwork/Viewer';
 import PrivateRoute from '@/utils/PrivateRoute';
 import Chat from '@/screens/Chat/Chat';
+import Favorites from '@/screens/Favorites/Favorites';
+import SearchPage from '@/screens/Search/SearchPage';
 
 const AppRoutes = () => {
     return (
         <Routes>
-            {/* Rutas públicas */}
+            {/* Principal Layout */}
             <Route element={<MainLayout />}>
+                {/* Public Routes */}
                 <Route path="/" element={<ArtVerse />} />
-                <Route path="/Artworks/:title/:artworkId/View" element={<ArtworkView />} />
-                <Route path="/Viewer" element={<Viewer/>}></Route>
-            </Route>
+                <Route path="/Artworks/View/:value" element={<ArtworkView />} />
+                <Route path="/Viewer" element={<Viewer />} />
+                <Route path="/Search" element={<SearchPage />} />
 
-            {/* Rutas protegidas */}
-            <Route element={<PrivateRoute />}>
-                <Route element={<MainLayout />}>
+                {/* Private Routes */}
+                <Route element={<PrivateRoute />}>
                     <Route path="/Profile/:value/:module" element={<Profile />} />
                     <Route path="/ProfileSettings/:value/:module" element={<ProfileSettings />} />
-                    {/* <Route path="/Favorites/:value/:module" element={<Favorites />} /> */}
+                    <Route path="/Favorites/:value/:module" element={<Favorites />} />
                     <Route path="/Chats/:value/:module" element={<Chat />} />
 
                     <Route path="/Artworks/New/:value/:module" element={<ArtworkStore />} />
-                    <Route path="/Artworks/:title/:artworkId/:module/Edit" element={<ArtworkEdit />} />
+                    <Route path="/Artworks/Edit/:value/:module" element={<ArtworkEdit />} />
                 </Route>
             </Route>
 
-            {/* Ruta para login */}
+
+            {/* Auth */}
             <Route element={<AuthLayout />}>
                 <Route path="/SignIn" element={<SignIn />} />
                 <Route path="/SignUp" element={<SignUp />} />
             </Route>
 
+            {/* 404 */}
             <Route path="/NotFound" element={<NotFoundPage />} />
             <Route path="*" element={<RedirectToNotFound />} />
         </Routes>

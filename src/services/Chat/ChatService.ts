@@ -29,7 +29,6 @@ export const useGetSingleChat = () => {
     });
 
     const getChatData = async (chatId: string, pagination: PaginationInterface) => {
-        console.log(pagination)
         return execute({ 
             variables: { chatId, pagination }
         });

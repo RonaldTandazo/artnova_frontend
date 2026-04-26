@@ -14,7 +14,7 @@ const ChatMessage = ({ message, currentUserId }: ChatMessagesInterface) => {
             marginBottom={3} 
             alignSelf={message.userId == currentUserId ? "flex-end" : "flex-start"}
             bg={message.userId == currentUserId
-                ? (colorMode === "light" ? "cyan.100" : "pink.500")
+                ? (colorMode === "light" ? "teal.100" : "pink.500")
                 : (colorMode === "light" ? "gray.200" : "gray.600")
             }
             color={colorMode === "light" ? "black" : "white"}

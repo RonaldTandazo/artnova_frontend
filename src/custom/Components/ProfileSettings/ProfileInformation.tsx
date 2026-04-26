@@ -5,7 +5,7 @@ import { IoIosSave } from "react-icons/io";
 import { ProfileFormValues, ProfileInformationProps } from "@/custom/interfaces/ProfileSettings/ProfileInformation";
 import { useProfileUpdate } from "@/services/User/UserService";
 import { useEffect } from "react";
-import { Notification } from "@/custom/interfaces/general/GeneralInterfaces";
+import { Notification } from "@/custom/interfaces/General/GeneralInterfaces";
 import LoadingProgress from "../States/LoadingProgress";
 import { useColorMode } from "@/components/ui/color-mode";
 
@@ -130,7 +130,7 @@ const ProfileInformation = ({user, countryLoading, countries, resetAlert, handle
                         <Button
                             type="submit" 
                             alignSelf={"flex-end"} 
-                            bg={colorMode === 'light' ? "cyan.600":"pink.600"} 
+                            bg={colorMode === 'light' ? "teal.400":"pink.600"} 
                             color={"white"}
                             loading={profileLoading}
                             disabled={profileLoading}

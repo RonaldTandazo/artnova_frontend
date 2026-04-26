@@ -72,7 +72,6 @@ const MultimediaDialog = ({
     }
 
     const onCropChange = (newCrop: Crop) => {
-        console.log(newCrop)
         setCrop(newCrop);
     };
 
@@ -90,7 +89,7 @@ const MultimediaDialog = ({
                 <Dialog.Backdrop />
                 <Dialog.Positioner>
                     <Dialog.Content>
-                        <Dialog.Header bg={colorMode === "light" ? "cyan.600":"blackAlpha.500"}>
+                        <Dialog.Header bg={colorMode === "light" ? "teal.400":"blackAlpha.500"}>
                             <Dialog.Title>
                                 <HStack
                                     justifyContent={"flex-start"}
@@ -142,16 +141,16 @@ const MultimediaDialog = ({
                         <Dialog.Footer>
                             <Dialog.ActionTrigger asChild>
                                 <Button
-                                    color={colorMode == 'light' ? 'cyan.600':'white'}
+                                    color={colorMode == 'light' ? 'teal.400':'white'}
                                     bg={colorMode == 'light' ? 'white':'black'}
-                                    borderColor={colorMode == 'light' ? 'cyan.600':'white'}
+                                    borderColor={colorMode == 'light' ? 'teal.400':'white'}
                                     onClick={handleClose}
                                 >
                                     <MdCancel /> Cancel
                                 </Button>
                             </Dialog.ActionTrigger>
                             <Button
-                                bg={colorMode === "light" ? "cyan.600":"pink.600"}
+                                bg={colorMode === "light" ? "teal.400":"pink.600"}
                                 color={"whiteAlpha.950"}
                                 onClick={handleConfirm}
                             >

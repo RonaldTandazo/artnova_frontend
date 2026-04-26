@@ -1,5 +1,5 @@
 import { GeneralInfoInterface } from "@/graphql/User/UserInterfaces"
-import { User } from "../general/GeneralInterfaces"
+import { User } from "../General/GeneralInterfaces"
 
 export interface ArtistMessageProps {
     artist: GeneralInfoInterface | undefined;

@@ -3,7 +3,7 @@ import { useLogin, useSignUp, useRefreshToken, useRevokeToken } from '../service
 import { useNavigate } from 'react-router-dom';
 import { ApolloError } from '@apollo/client';
 import { setAuthCallbacks } from '@/utils/ApolloClient';
-import { User } from '@/custom/interfaces/general/GeneralInterfaces';
+import { User } from '@/custom/interfaces/General/GeneralInterfaces';
 import { AuthContextType } from '@/custom/interfaces/Context/AuthContextInterfaces';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);

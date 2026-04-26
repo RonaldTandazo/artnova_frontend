@@ -90,7 +90,7 @@ const ArtworkComments = ({
                                 
                                 <Button
                                     size="xs"
-                                    bg={colorMode === "light" ? "cyan.600" : "pink.600"}
+                                    bg={colorMode === "light" ? "teal.400" : "pink.600"}
                                     color={"white"}
                                     shadow={"md"}
                                     borderRadius={"md"}
@@ -117,7 +117,6 @@ const ArtworkComments = ({
                                     fallback={
                                         <Empty
                                             title="No Comments Posted Yet"
-                                            default_description={false}
                                         />
                                     }
                                 >
@@ -149,7 +148,7 @@ const ArtworkComments = ({
                                                             <Link 
                                                                 variant="plain" 
                                                                 href={toProfile(comment.userId)} 
-                                                                color={colorMode == "light" ? "cyan.600":"pink.600"}
+                                                                color={colorMode == "light" ? "teal.400":"pink.600"}
                                                             >
                                                                 {comment.username}
                                                             </Link>

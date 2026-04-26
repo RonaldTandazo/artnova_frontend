@@ -1,4 +1,4 @@
-import { User } from "@/custom/interfaces/general/GeneralInterfaces"
+import { User, UserStats } from "@/custom/interfaces/General/GeneralInterfaces"
 import { ProfileFormValues } from "@/custom/interfaces/ProfileSettings/ProfileInformation"
 
 export interface UserVariablesInterface {
@@ -12,6 +12,10 @@ export interface GeneralInfoInterface extends User {
 
 export interface UserGeneralInterface {
     getUserGeneralData: GeneralInfoInterface
+}
+
+export interface GetUserStats {
+    getUserStats: UserStats
 }
 
 export interface ProfileUpdatePayload {

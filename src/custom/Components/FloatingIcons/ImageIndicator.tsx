@@ -17,7 +17,7 @@ const ImageIndicator = () => {
         >
             <Icon
                 size="md" 
-                color={colorMode === "light" ? "cyan.600" : "pink.600"}
+                color={colorMode === "light" ? "teal.400" : "pink.600"}
             >
                 <IoMdImages />
             </Icon>

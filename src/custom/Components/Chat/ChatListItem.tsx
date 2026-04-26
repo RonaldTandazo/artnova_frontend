@@ -7,7 +7,7 @@ const ChatListItem = ({ chat, isSelected, onClick, currentUserId }: ChatListItem
     const { colorMode } = useColorMode();
 
     const colors = colorMode === "light"
-        ? { selected: "cyan.100", normal: "whiteAlpha.500", border: "cyan.600", text: "cyan.600" }
+        ? { selected: "teal.100", normal: "whiteAlpha.500", border: "teal.400", text: "teal.400" }
         : { selected: "pink.100", normal: "blackAlpha.500", border: "pink.600", text: "pink.600" };
 
     const bgColor = isSelected ? colors.selected : colors.normal;
@@ -45,27 +45,36 @@ const ChatListItem = ({ chat, isSelected, onClick, currentUserId }: ChatListItem
                 </Avatar.Root>
 
                 <Box 
-                    w={"full"}
+                    w="full"
+                    minW={0}
+                    overflow="hidden"
                 >
                     <Text 
-                        fontWeight={"bold"}
+                        fontWeight="bold"
                         color={colors.text}
+                        truncate
                     >
                         {chat.artist.username}
                     </Text>
 
                     <Flex
                         justify="space-between" 
-                        align="center" 
+                        align="center"
+                        w="full"
+                        minW={0}
                     >
                         <Box
                             flex={1} 
                             minW={0}
+                            mr={2}
                         >
                             <Text
                                 fontSize="sm"
-                                truncate
-                                color={isCurrentUser ? "gray.600" : "gray.500"} 
+                                color={isCurrentUser ? "gray.600" : "gray.500"}
+                                whiteSpace="nowrap"
+                                overflow="hidden"
+                                textOverflow="ellipsis"
+                                display="block"
                             >
                                 <Text 
                                     as="span" 
@@ -74,21 +83,15 @@ const ChatListItem = ({ chat, isSelected, onClick, currentUserId }: ChatListItem
                                 >
                                     {messagePrefix}
                                 </Text>
-                                
-                                <Text 
-                                    as="span"
-                                >
-                                    {messageContent}
-                                </Text>
+                                {messageContent}
                             </Text>
                         </Box>
 
-                        <Box
-                            flexShrink={0}
-                        >
+                        <Box flexShrink={0}>
                             <Text 
                                 fontSize="xs" 
                                 color={colors.text}
+                                whiteSpace="nowrap"
                             >
                                 {chat.lastMessage.date}
                             </Text>

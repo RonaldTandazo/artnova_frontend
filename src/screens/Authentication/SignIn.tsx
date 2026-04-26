@@ -95,6 +95,7 @@ const SignIn = () => {
                                             <Checkbox.Root
                                                 checked={field.value}
                                                 onCheckedChange={({ checked }) => field.onChange(checked)}
+                                                colorPalette={colorMode === 'light' ? 'teal.400':'pink'}
                                             >
                                                 <Checkbox.HiddenInput />
                                                 <Checkbox.Control />
@@ -106,7 +107,7 @@ const SignIn = () => {
 
                                 <Button 
                                     type="submit" 
-                                    bg={"cyan.600"} 
+                                    bg={colorMode === 'light' ? "teal.400":'pink.600'}
                                     color={"white"}
                                     loading={loading}
                                     disabled={loading}
@@ -120,7 +121,12 @@ const SignIn = () => {
                 <Card.Footer alignSelf={"center"}>
                     <Stack align="center">
                         <Card.Description>Don't have an account?</Card.Description>
-                        <Button color={"white"} bg={colorMode === "light" ? "blackAlpha.800":""} onClick={() => navigate("/SignUp")} size={"xs"}>
+                        <Button
+                            color={"white"}
+                            bg={"blackAlpha.950"}
+                            onClick={() => navigate("/SignUp")} 
+                            size={"md"}
+                        >
                             Sign Up Here
                         </Button>
                     </Stack>

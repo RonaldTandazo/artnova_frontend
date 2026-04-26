@@ -1,10 +1,11 @@
 import { gql } from "@apollo/client";
 
-const ArtistMessage = gql`
-    fragment ArtistMessage on ArtistPayload {
+export const ArtistInterface = gql`
+    fragment ArtistInterface on ArtistPayload {
         artistId
         username
         avatar
+        cover
     }
 `;
 
@@ -21,7 +22,7 @@ export const GET_CHATS = gql`
         getChats(pagination: $pagination){
             chatId
             artist {
-                ...ArtistMessage
+                ...ArtistInterface
             }
             lastMessage {
                 ...LastMessage
@@ -31,7 +32,7 @@ export const GET_CHATS = gql`
             hasBlockedMe
         }
     }
-    ${ArtistMessage}
+    ${ArtistInterface}
     ${LastMessage}
 `;
 

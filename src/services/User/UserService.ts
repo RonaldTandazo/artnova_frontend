@@ -1,8 +1,8 @@
 import { CombinedGraphQLErrors } from '@apollo/client/errors';
 import { useLazyQuery, useMutation } from '@apollo/client/react';
 import { STORE_USER_PCITURE, PROFILE_MUTATION, CHANGE_PASSWORD_MUTATION } from '@/graphql/User/UserMutations';
-import { ProfileUpdatePayload, StoreUserPicture, UserGeneralInterface } from '@/graphql/User/UserInterfaces';
-import { GET_USER_DATA } from '@/graphql/User/UserQueries';
+import { GetUserStats, ProfileUpdatePayload, StoreUserPicture, UserGeneralInterface } from '@/graphql/User/UserInterfaces';
+import { GET_USER_DATA, GET_USER_STATS_DATA } from '@/graphql/User/UserQueries';
 
 export const useGetUserData = () => {
     const [execute, { data, loading, error }] = useLazyQuery<UserGeneralInterface>(GET_USER_DATA, {
@@ -23,13 +23,32 @@ export const useGetUserData = () => {
     };
 };
 
+export const useGetUserStatsData = () => {
+    const [execute, { data, loading, error }] = useLazyQuery<GetUserStats>(GET_USER_STATS_DATA, {
+        fetchPolicy: 'network-only'
+    });
+
+    const getUserStats = async (userId: number | undefined) => {
+        return execute({ 
+            variables: { userId }
+        });
+    };
+
+    return {
+        getUserStats,
+        data,
+        loading,
+        error,
+    };
+};
+
 export const useStoreUserPicture = () => {
     const [userPictureMutation, { data, loading, error }] = useMutation<StoreUserPicture>(STORE_USER_PCITURE);
 
-    const storeUserPicture = async (picture: File) => {
+    const storeUserPicture = async (data: any) => {
         try {
             return await userPictureMutation({ 
-                variables: { picture }
+                variables: { data }
             });
         } catch (err) {
             if (err instanceof CombinedGraphQLErrors) {

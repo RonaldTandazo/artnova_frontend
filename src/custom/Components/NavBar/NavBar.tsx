@@ -1,24 +1,23 @@
 import { useColorMode } from "@/components/ui/color-mode";
 import { useAuth } from "@/context/AuthContext";
 import { encodeToBase64 } from "@/utils/Helpers";
-import { Avatar, Box, Button, Flex, HStack, Icon, Input, InputGroup, Menu, Portal, Show, Spacer, Text } from "@chakra-ui/react"
+import { Box, Button, Flex, HStack, Icon, Input, InputGroup, Spacer, Text } from "@chakra-ui/react"
 import { useEffect, useState } from "react";
 import { BsFillPersonVcardFill, BsPencilSquare, BsSearch } from "react-icons/bs";
-import { CiLogout } from "react-icons/ci";
-import { FaUser } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import LoadingProgress from "../States/LoadingProgress";
 import { GiAtomicSlashes } from "react-icons/gi";
 import { FaBookBookmark, FaComments } from "react-icons/fa6";
-import { MdManageAccounts } from "react-icons/md";
-
-const BACKEND_URL = import.meta.env.VITE_API_URL;
+import { Tooltip } from "@/components/ui/tooltip";
+import NotificationTrigger from "./NotificationTrigger";
+import AccountTrigger from "./AccountTrigger";
 
 const NavBar = () => {
-    const { colorMode } = useColorMode();
-    const [isScrolled, setIsScrolled] = useState(false);
-    const { user, isAuthenticated, loading, logout } = useAuth();
     const navigate = useNavigate();
+    const { colorMode } = useColorMode();
+    const { user, isAuthenticated, loading, logout } = useAuth();
+    const [isScrolled, setIsScrolled] = useState<boolean>(false);
+    const [searchQuery, setSearchQuery] = useState<string>("");
 
     const handleScroll = () => {
         if (window.scrollY > 10) {
@@ -37,14 +36,23 @@ const NavBar = () => {
         if(user){
             const encodedUserId = encodeToBase64(user.userId);
             const encodedModule = encodeToBase64(module);
+
+            const safeUserId = encodeURIComponent(encodedUserId);
+            const safeModule = encodeURIComponent(encodedModule);
     
-            navigate(`/${route}/${encodedUserId}/${encodedModule}`);
+            navigate(`/${route}/${safeUserId}/${safeModule}`);
         }
     }
 
     const handleNavigate = () => {
         navigate("/")
     }
+
+    const handleSearch = (e: React.KeyboardEvent) => {
+        if (e.key === "Enter" && searchQuery.trim()) {
+            navigate(`/Search?s=${encodeURIComponent(searchQuery)}`);
+        }
+    };
 
     let authButtons;
     if (loading) {
@@ -63,7 +71,7 @@ const NavBar = () => {
                 </Button>
                 <Button
                     bg={"white"}
-                    color={colorMode == "light" ? "cyan.600":"pink.600"}
+                    color={colorMode == "light" ? "teal.400":"pink.600"}
                     onClick={() => navigate("/SignIn")}
                 >
                     <BsFillPersonVcardFill /> Sign In
@@ -73,82 +81,65 @@ const NavBar = () => {
     }else if(isAuthenticated && user){
         authButtons = (
             <>
-                <Icon
-                    color={"white"}
-                    size={"lg"}
-                    cursor={"pointer"}
-                    onClick={() => handleNavigateRoutes('Favourites')}
+                <Tooltip
+                    content={`Favorites`}
+                    openDelay={200}
+                    closeDelay={100}
+                    unmountOnExit={true}    
+                    lazyMount={true}
+                    positioning={{ placement: "left" }}
+                    showArrow
+                    contentProps={{ 
+                        css: { 
+                            "--tooltip-bg": colorMode === "light" ? "white":"black",
+                            "color": colorMode === "light" ? "black":"white"
+                        }
+                    }}
                 >
-                    <FaBookBookmark />
-                </Icon>
+                    <Icon
+                        color={"white"}
+                        size={"lg"}
+                        cursor={"pointer"}
+                        onClick={() => handleNavigateRoutes('Favorites')}
+                    >
+                        <FaBookBookmark />
+                    </Icon>
+                </Tooltip>
 
-                <Icon
-                    color={"white"}
-                    size={"lg"}
-                    cursor={"pointer"}
-                    onClick={() => handleNavigateRoutes('Chats')}
+                <NotificationTrigger
+                    user={user}
+                />
+
+                <Tooltip
+                    content={`Chats`}
+                    openDelay={200}
+                    closeDelay={100}
+                    unmountOnExit={true}    
+                    lazyMount={true}
+                    positioning={{ placement: "left" }}
+                    showArrow
+                    contentProps={{ 
+                        css: { 
+                            "--tooltip-bg": colorMode === "light" ? "white":"black",
+                            "color": colorMode === "light" ? "black":"white"
+                        }
+                    }}
                 >
-                    <FaComments />
-                </Icon>
+                    <Icon
+                        color={"white"}
+                        size={"lg"}
+                        cursor={"pointer"}
+                        onClick={() => handleNavigateRoutes('Chats')}
+                    >
+                        <FaComments />
+                    </Icon>
+                </Tooltip>
 
-                <Menu.Root lazyMount>
-                    <Menu.Trigger asChild>
-                        <Button bg={"transparent"} color={"transparent"} borderRadius={"full"} width={"0px"}>
-                            <Avatar.Root
-                                key={"subtle"} 
-                                variant={"subtle"}
-                                cursor={"pointer"}
-                            >
-                                <Show
-                                    when={user && user.avatar}
-                                    fallback={
-                                        <Avatar.Fallback name={user?.username} />
-                                    }
-                                >
-                                    <Avatar.Image src={`${BACKEND_URL}/avatars/${user.avatar}`} />
-                                </Show>
-                            </Avatar.Root>
-                        </Button>
-                    </Menu.Trigger>
-                    <Portal>
-                        <Menu.Positioner>
-                            <Menu.Content zIndex={"toast"}>
-                                <Menu.ItemGroup>
-                                    <Menu.Item 
-                                        value="profile" 
-                                        onClick={() => handleNavigateRoutes('OwnProfile', 'Profile')} 
-                                        cursor={"pointer"}
-                                    >
-                                        <FaUser />
-                                        Profile
-                                    </Menu.Item>
-                                    <Menu.Item 
-                                        value="edit-profile" 
-                                        onClick={() => handleNavigateRoutes('OwnProfile', 'ProfileSettings')} 
-                                        cursor={"pointer"}
-                                    >
-                                        <MdManageAccounts />
-                                        Profile Settings
-                                    </Menu.Item>
-                                </Menu.ItemGroup>
-
-                                <Menu.Separator />
-                                
-                                <Menu.ItemGroup>
-                                    <Menu.Item 
-                                        value="sign-out" 
-                                        onClick={() => logout()} 
-                                        cursor={"pointer"}
-                                        color="fg.error"
-                                        _hover={{ bg: "bg.error", color: "fg.error" }}
-                                    >
-                                        <CiLogout /> Sign Out
-                                    </Menu.Item>
-                                </Menu.ItemGroup>
-                            </Menu.Content>
-                        </Menu.Positioner>
-                    </Portal>
-                </Menu.Root>
+                <AccountTrigger 
+                    user={user}
+                    logout={logout}
+                    navigateTo={(module, route) => handleNavigateRoutes(module, route)}
+                />
             </>
         )
     }
@@ -156,7 +147,7 @@ const NavBar = () => {
     return (
         <Box 
             as="nav" 
-            bg={colorMode === "light" ? "cyan.600" : "pink.600"}
+            bg={colorMode === "light" ? "teal.400" : "pink.600"}
             position="sticky" 
             top="0" 
             p={5}
@@ -202,6 +193,9 @@ const NavBar = () => {
                             borderRadius="full" 
                             size="lg" 
                             borderColor={"whiteAlpha.950"}
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            onKeyDown={handleSearch}
                         />
                     </InputGroup>
                 </Flex>

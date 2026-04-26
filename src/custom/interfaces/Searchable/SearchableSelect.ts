@@ -1,4 +1,4 @@
-import { SelectOptions } from "../general/GeneralInterfaces";
+import { SelectOptions } from "../General/GeneralInterfaces";
 
 export interface SearchableSelectProps {
     disabled?: boolean;

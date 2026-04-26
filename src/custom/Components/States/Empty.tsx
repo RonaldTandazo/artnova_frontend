@@ -1,50 +1,47 @@
 import { useColorMode } from "@/components/ui/color-mode";
-import { EmptyState, Flex, Icon, VStack } from "@chakra-ui/react"
-import { useEffect, useState } from "react";
+import { EmptyProps } from "@/custom/interfaces/States/Empty";
+import { EmptyState, Flex, Icon, Show, VStack } from "@chakra-ui/react"
 import { MdHideSource } from "react-icons/md"
 
-const Empty = ({ title, description, default_description = true }: any) => {
+const Empty = ({
+    title = "No Data Available",
+    description = "No Content to Show",
+    showIcon = true,
+    showDescription = true
+}: EmptyProps) => {
     const { colorMode } = useColorMode();
-    const [header, setHeader] = useState("No Data Available")
-    const [subtle, setSubtle] = useState("No content to show")
-
-    useEffect(() => {
-        if(title){
-            setHeader(title);
-        }
-
-        if(!default_description){
-            setSubtle('');
-        }
-
-        if(description){
-            setSubtle(description);
-        }
-
-    }, [title, description, default_description])
 
     return (
         <Flex 
             h="full" 
             align="center" 
             justify="center"
-            mb={10}
         >
             <EmptyState.Root>
                 <EmptyState.Content>
-                    <Icon
-                        boxSize={"300px"}
-                        color={colorMode === "light" ? "cyan.600":"pink.600"}
-                    >        
-                        <MdHideSource />
-                    </Icon>
+                    <Show
+                        when={showIcon}
+                    >
+                        <EmptyState.Indicator>
+                            <Icon
+                                boxSize={"300px"}
+                                color={colorMode === "light" ? "teal.400":"pink.600"}
+                            >        
+                                <MdHideSource />
+                            </Icon>
+                        </EmptyState.Indicator>
+                    </Show>
 
                     <VStack 
                         textAlign="center"
                         color={colorMode === "light" ? "black":"white"}
                     >
-                        <EmptyState.Title>{ header }</EmptyState.Title>
-                        <EmptyState.Description>{ subtle }</EmptyState.Description>
+                        <EmptyState.Title>{ title }</EmptyState.Title>
+                        <Show
+                            when={showDescription}
+                        >
+                            <EmptyState.Description>{ description }</EmptyState.Description>
+                        </Show>
                     </VStack>
                 </EmptyState.Content>
             </EmptyState.Root>

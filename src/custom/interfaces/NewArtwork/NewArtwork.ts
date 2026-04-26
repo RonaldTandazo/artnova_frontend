@@ -1,4 +1,4 @@
-import { Publishing } from "../general/GeneralInterfaces"
+import { Publishing } from "../General/GeneralInterfaces"
 import { Category, Software, Topic } from "../ProfileSettings/ProfileSkillsInterests"
 
 export interface GetArtWorkFormData {

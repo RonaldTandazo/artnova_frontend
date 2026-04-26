@@ -1,5 +1,5 @@
 import { ChatItemInterface, MessageInterface } from "@/graphql/Chat/ChatInterfaces";
-import { Notification, User } from "@/custom/interfaces/general/GeneralInterfaces";
+import { Notification, User } from "@/custom/interfaces/General/GeneralInterfaces";
 import { Dispatch, SetStateAction } from "react";
 
 export interface ChatMessagesInterface {
@@ -22,7 +22,7 @@ export interface TriggerMessageInterface {
 export interface ChatBoxInterface {
     openChat: boolean
     chatId: string | undefined
-    user: User | null
+    user: User | undefined
     triggerMessage: TriggerMessageInterface
     onToggleNewMessage: () => void
     setChats: Dispatch<SetStateAction<ChatItemInterface[]>>;
@@ -33,7 +33,7 @@ export interface ChatSidebarInterface {
     setChats: Dispatch<SetStateAction<ChatItemInterface[]>>;
     selectedChat: ChatItemInterface | undefined
     onSelectChat: (chat: ChatItemInterface) => void
-    user: User | null
+    user: User | undefined
 }
 
 export interface ChatWindowInterface {
@@ -41,12 +41,12 @@ export interface ChatWindowInterface {
     setChats: Dispatch<SetStateAction<ChatItemInterface[]>>;
     setSelectedChat: Dispatch<SetStateAction<ChatItemInterface | undefined>>
     selectedChat: ChatItemInterface | undefined
-    user: User | null
+    user: User | undefined
 }
 
 export interface ChatHeaderInterface{
     selectedChat: ChatItemInterface | undefined
-    user: User | null
+    user: User | undefined
     setChats: Dispatch<SetStateAction<ChatItemInterface[]>>;
     setSelectedChat: Dispatch<SetStateAction<ChatItemInterface | undefined>>
     onShowMessage: (dataNotification: Notification) => void

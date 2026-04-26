@@ -9,17 +9,22 @@ import { useColorMode } from "@/components/ui/color-mode";
 import { MdHideImage } from "react-icons/md";
 import ImageIndicator from "../FloatingIcons/ImageIndicator";
 import { Tooltip } from "@/components/ui/tooltip";
+import { ArtVerseGridItemProps } from "@/custom/interfaces/ArtVerse/ArtVerseGridItemProps";
+import { ArtVerseArtWork } from "@/custom/interfaces/ArtVerse/ArtVerse";
 
 const MotionBox = motion.create(Box);
 
-const ArtVerseGridItem = ({ artwork }: { artwork: any }) => {
+const ArtVerseGridItem = ({ artwork }: ArtVerseGridItemProps) => {
     const [isHovered, setIsHovered] = useState(false);
     const { colorMode }  = useColorMode();
     const navigate = useNavigate();
 
-    const handleNavigate = (artwork: any) => {
+    const handleNavigate = (artwork: ArtVerseArtWork) => {
         const encodedArtworkId = encodeToBase64(artwork.artworkId);
-        navigate(`/ArtWorks/${artwork.title}/${encodedArtworkId}/View`);
+        
+        const safeArtworkId = encodeURIComponent(encodedArtworkId);
+
+        navigate(`/ArtWorks/View/${safeArtworkId}`);
     }
 
     return (
@@ -48,7 +53,9 @@ const ArtVerseGridItem = ({ artwork }: { artwork: any }) => {
                             display={"flex"}
                             alignItems={"center"}
                             justifyContent={"center"}
-                            bg={colorMode === 'light' ? 'cyan.600' : 'pink.600'}
+                            bgGradient={"to-br"}
+                            gradientFrom={colorMode === 'light' ? "purple.500":"pink.700"} 
+                            gradientTo={colorMode === 'light' ? "teal.400":"cyan.900"}
                             color={'whiteAlpha.950'}
                             borderRadius={"sm"}
                         >
@@ -79,7 +86,7 @@ const ArtVerseGridItem = ({ artwork }: { artwork: any }) => {
                     h="100%"
                     backgroundImage={isHovered ? 
                         "linear-gradient(to top, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0))"
-                        : "none"
+                        : undefined
                     }
                     color="white"
                     display="flex"
@@ -105,7 +112,7 @@ const ArtVerseGridItem = ({ artwork }: { artwork: any }) => {
                                 showArrow
                                 contentProps={{ 
                                     css: { 
-                                        "--tooltip-bg": colorMode === "light" ? "colors.cyan.600":"colors.pink.600",
+                                        "--tooltip-bg": colorMode === "light" ? "colors.teal.400":"colors.pink.600",
                                         'color': 'white'
                                     }
                                 }}
@@ -126,7 +133,7 @@ const ArtVerseGridItem = ({ artwork }: { artwork: any }) => {
                                 showArrow
                                 contentProps={{ 
                                     css: { 
-                                        "--tooltip-bg": colorMode === "light" ? "colors.cyan.600":"colors.pink.600",
+                                        "--tooltip-bg": colorMode === "light" ? "colors.teal.400":"colors.pink.600",
                                         'color': 'white'
                                     }
                                 }}

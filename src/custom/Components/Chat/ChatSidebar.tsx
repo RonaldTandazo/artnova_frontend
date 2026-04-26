@@ -1,5 +1,5 @@
 import { useColorMode } from "@/components/ui/color-mode";
-import { Box, Center, Flex, For, Icon, List, Show, Text, useBreakpointValue, VStack } from "@chakra-ui/react";
+import { Box, Flex, For, Icon, List, Show, Text, useBreakpointValue, VStack } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { BsChatFill } from "react-icons/bs";
 import Empty from "../States/Empty";
@@ -51,19 +51,23 @@ const ChatSidebar = ({chats, setChats, selectedChat, onSelectChat, user}: ChatSi
             direction={"column"}
             borderRight={"1px solid"}
             display={sidebarDisplay}
-            borderColor={colorMode == 'light' ? 'cyan.600':"pink.600"}
+            borderColor={colorMode == 'light' ? 'teal.400':"pink.600"}
             bg={colorMode == 'light' ? "whiteAlpha.500":"blackAlpha.500"}
         >
             <Box
-                p={5}
+                px={5}
                 shadow={"md"}
-                bg={colorMode == 'light' ? 'cyan.600':"pink.600"}
+                bg={colorMode == 'light' ? 'teal.400':"pink.600"}
                 flexShrink={0}
+                h={"65px"}
+                display="flex"
+                alignItems="center"
             >
                 <Flex
                     gap={2}
                     alignItems={"center"}
                     direction={"row"}
+                    w="full"
                 >
                     <Text 
                         fontSize="2xl" 
@@ -94,7 +98,6 @@ const ChatSidebar = ({chats, setChats, selectedChat, onSelectChat, user}: ChatSi
                     <Empty 
                         title={"No Chats to Show"}
                         description={"Contact to an Artist to start a conversation"}
-                        default_description={false}
                     />
                 </Show>
 

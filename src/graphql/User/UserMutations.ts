@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
 export const STORE_USER_PCITURE = gql`
-    mutation StoreUserPicture($picture: Upload!) { 
-        storeUserPicture(picture: $picture){
+    mutation StoreUserPicture($data: StorePictureInput!) { 
+        storeUserPicture(data: $data){
             label
             value
         }

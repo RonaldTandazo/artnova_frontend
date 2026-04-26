@@ -4,7 +4,7 @@ import LoadingProgress from "../States/LoadingProgress";
 import { SocialMediaFormValues, ProfileSocialMediaProps, UserSocialMedia,  } from "@/custom/interfaces/ProfileSettings/ProfileSocialMedia";
 import { useGetUserSocialMedia, useRemoveUserSocialNetowrk, useStoreUserSocialNetowrk, useUpdateUserSocialNetowrk } from "@/services/UserSocialNetwork/UserSocialNetworkService";
 import { Controller, useForm } from "react-hook-form";
-import { Notification } from "@/custom/interfaces/general/GeneralInterfaces";
+import { Notification } from "@/custom/interfaces/General/GeneralInterfaces";
 import SearchableSelect from "../Searchable/SearchableSelect";
 import SocialMediaListItem from "../SocialMedia/SocialMediaListItem";
 import { useEffect, useState } from "react";
@@ -180,7 +180,7 @@ const ProfileSocialMedia = ({socialMedia, socialMediaLoading, resetAlert, handle
                             <Button
                                 type="submit" 
                                 alignSelf={"flex-end"} 
-                                bg={colorMode === 'light' ? "cyan.600":"pink.600"}  
+                                bg={colorMode === 'light' ? "teal.400":"pink.600"}  
                                 color={"white"}
                                 loading={storeUserNetworkLoading}
                                 disabled={storeUserNetworkLoading}

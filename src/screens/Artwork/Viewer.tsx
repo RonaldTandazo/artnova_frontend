@@ -3,7 +3,7 @@ import { Canvas, useLoader } from "@react-three/fiber";
 import { OBJLoader, MTLLoader } from "three-stdlib";
 import { Box, Button, FileUpload, Heading, Icon, Show } from "@chakra-ui/react";
 import { LuUpload } from "react-icons/lu";
-import { useGLTF, OrbitControls } from '@react-three/drei';
+import { useGLTF, OrbitControls, Stars } from '@react-three/drei';
 import LoadingProgress from "@/custom/Components/States/LoadingProgress";
 
 function ModeloOBJ({ objUrl, mtlUrl, setLoading }) {

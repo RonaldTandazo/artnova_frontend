@@ -3,9 +3,7 @@ import { getMainDefinition } from '@apollo/client/utilities';
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
 import { createClient } from 'graphql-ws';
 import UploadHttpLink from 'apollo-upload-client/UploadHttpLink.mjs';
-
-const apiUrl = import.meta.env.VITE_API_URL;
-const wsUrl = import.meta.env.VITE_WS_URL;
+import { BACKEND_URL, WS_URL } from './Helpers';
 
 let getAccessToken: () => string | null = () => null;
 let getRefreshToken: () => string | null = () => null;
@@ -27,7 +25,7 @@ export const setAuthCallbacks = (
 };
 
 const httpLink = new UploadHttpLink({
-  uri: `${apiUrl}/graphql`,
+  uri: `${BACKEND_URL}/graphql`,
 });
 
 const authLink = new ApolloLink((operation, forward) => {
@@ -116,7 +114,7 @@ const errorLink = new ApolloLink((operation, forward) => {
 });
 
 const wsLink = new GraphQLWsLink(createClient({
-  url: `${wsUrl}/graphql/ws`,
+  url: `${WS_URL}/graphql/ws`,
   connectionParams: () => {
     const token = getAccessToken();
     return {

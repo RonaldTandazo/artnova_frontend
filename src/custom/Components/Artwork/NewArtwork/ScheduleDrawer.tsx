@@ -4,7 +4,7 @@ import { useState } from "react";
 import { FaCalendarCheck, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { MdCancel } from "react-icons/md";
 import { RiCalendarScheduleFill } from "react-icons/ri";
-import { type DateValue, Time, getLocalTimeZone, isToday } from "@internationalized/date"
+import { type DateValue, Time, getLocalTimeZone, isToday, now, today } from "@internationalized/date"
 import { TimeGrid } from "./TimeGrid";
 import { formatMonthDay, formatTime, formatWeekday, generateTimeSlots } from "@/utils/Helpers";
 import { ScheduleDrawerProps } from "@/custom/interfaces/NewArtwork/ScheduleDrawer";
@@ -21,7 +21,15 @@ const ScheduleDrawer = ({
     
     const tz = getLocalTimeZone();
     const date = selectedDate[0];
-    const slots = date ? generateTimeSlots(interval) : [];
+    const nowTime = now(tz)
+    const currentTime = new Time(nowTime.hour, nowTime.minute, nowTime.second)
+    const minDate = today(tz);
+    const allSlots = date ? generateTimeSlots(interval) : [];
+    const slots = date
+    ? isToday(date, tz)
+        ? allSlots.filter((t) => t.compare(currentTime) > 0)
+        : allSlots
+    : [];
     const nativeDate = date?.toDate(tz);
 
     const handleDateChange = (details: { value: DateValue[] }) => {
@@ -70,12 +78,13 @@ const ScheduleDrawer = ({
                                     inline
                                     value={selectedDate}
                                     onValueChange={handleDateChange}
+                                    min={minDate}
                                 >
                                     <DatePicker.Content unstyled px="3" pb="4">
                                         <DatePicker.View view="day">
                                             <HStack justify="space-between" gap="0">
                                                 <DatePicker.PrevTrigger
-                                                    bg={colorMode === "light" ? "cyan.600":"black"}
+                                                    bg={colorMode === "light" ? "teal.400":"black"}
                                                 >
                                                     <Icon 
                                                         as={FaChevronLeft}
@@ -88,7 +97,7 @@ const ScheduleDrawer = ({
                                                     color={colorMode === 'light' ? 'black':'white'}
                                                 />
                                                 <DatePicker.NextTrigger
-                                                    bg={colorMode === "light" ? "cyan.600":"black"}
+                                                    bg={colorMode === "light" ? "teal.400":"black"}
                                                 >
                                                     <Icon 
                                                         as={FaChevronRight}
@@ -138,16 +147,16 @@ const ScheduleDrawer = ({
                         </Drawer.Body>
                         <Drawer.Footer>
                             <Button 
-                                color={colorMode == 'light' ? 'cyan.600':'white'}
+                                color={colorMode == 'light' ? 'teal.400':'white'}
                                 bg={colorMode == 'light' ? 'white':'black'}
-                                borderColor={colorMode == 'light' ? 'cyan.600':'white'}
+                                borderColor={colorMode == 'light' ? 'teal.400':'white'}
                                 onClick={onClose}
                             >
                                 <MdCancel />
                                 Cancel
                             </Button>
                             <Button
-                                bg={colorMode === "light" ? "cyan.600":"pink.600"}
+                                bg={colorMode === "light" ? "teal.400":"pink.600"}
                                 color={"whiteAlpha.950"}
                                 maxW={"45%"}
                                 disabled={!date || !selectedTime} 
@@ -160,9 +169,9 @@ const ScheduleDrawer = ({
                         <Drawer.CloseTrigger asChild>
                             <CloseButton 
                                 size="sm"
-                                color={colorMode == 'light' ? 'cyan.600':'white'}
+                                color={colorMode == 'light' ? 'teal.400':'white'}
                                 bg={colorMode == 'light' ? 'white':'black'}
-                                borderColor={colorMode == 'light' ? 'cyan.600':'white'}
+                                borderColor={colorMode == 'light' ? 'teal.400':'white'}
                                 onClick={onClose}
                             />
                         </Drawer.CloseTrigger>

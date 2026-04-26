@@ -1,4 +1,4 @@
-import { User } from "../general/GeneralInterfaces";
+import { User } from "../General/GeneralInterfaces";
 import { ArtworkComment } from "./ArtworkView";
 
 export interface PostingCommentsProps {

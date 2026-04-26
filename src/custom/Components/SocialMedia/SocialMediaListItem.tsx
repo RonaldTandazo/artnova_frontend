@@ -91,7 +91,7 @@ const SocialMediaListItem = ({
                                 <GridItem alignItems={'center'} display={'flex'} justifyContent={'center'}>
                                     <Menu.Root unmountOnExit lazyMount open={menuOpen}>
                                         <Menu.Trigger asChild onClick={() => setMenuOpen(!menuOpen)}>
-                                            <Button size={'md'} bg={'transparent'} color={colorMode === 'light' ? 'cyan.600' : 'pink.600'} ref={buttonRef}>
+                                            <Button size={'md'} bg={'transparent'} color={colorMode === 'light' ? 'teal.400' : 'pink.600'} ref={buttonRef}>
                                                 <Icon size={'lg'}>
                                                     <GrMenu />
                                                 </Icon>
@@ -107,7 +107,7 @@ const SocialMediaListItem = ({
                                                         onClick={() => handleEditClick(item)}
                                                         cursor={"pointer"}
                                                     >
-                                                        <Icon size={'sm'} color={colorMode === 'light' ? 'cyan.600' : 'pink.600'}>
+                                                        <Icon size={'sm'} color={colorMode === 'light' ? 'teal.400' : 'pink.600'}>
                                                             <AiFillEdit />
                                                         </Icon>
                                                         
@@ -170,7 +170,7 @@ const SocialMediaListItem = ({
                         </GridItem>
                         <GridItem alignItems={'center'} display={'flex'} justifyContent={'space-evenly'}>
                             <Icon
-                                color={colorMode === 'light' ? "cyan.600":'pink.600'}
+                                color={colorMode === 'light' ? "teal.400":'pink.600'}
                                 size={"lg"}
                                 cursor={"pointer"}
                                 onClick={onSubmitUpdateSocialMedia}
@@ -179,7 +179,7 @@ const SocialMediaListItem = ({
                             </Icon>
 
                             <Icon
-                                color={colorMode === 'light' ? "cyan.600":'pink.600'}
+                                color={colorMode === 'light' ? "teal.400":'pink.600'}
                                 size={"lg"}
                                 cursor={"pointer"}
                                 onClick={() => setEditingId(null)}

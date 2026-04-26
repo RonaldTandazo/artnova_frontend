@@ -125,7 +125,7 @@ const SignUp = () => {
                             <Button 
                                 type="submit" 
                                 alignSelf={"flex-end"} 
-                                bg={"cyan.600"} 
+                                bg={colorMode === 'light' ? "teal.400":'pink.600'} 
                                 color={"white"}
                                 loading={loading}
                                 disabled={loading}
@@ -138,7 +138,12 @@ const SignUp = () => {
                 <Card.Footer alignSelf={"center"}>
                     <Stack align="center">
                         <Card.Description>Already have an account?</Card.Description>
-                        <Button color={"white"} bg={colorMode === "light" ? "blackAlpha.800":""} onClick={() => navigate("/SignIn")} size={"xs"}>
+                        <Button 
+                            color={"white"}
+                            bg={"blackAlpha.950"}
+                            onClick={() => navigate("/SignIn")}
+                            size={"md"}
+                        >
                             Sign In Here
                         </Button>
                     </Stack>

@@ -1,6 +1,6 @@
 import { useColorMode } from "@/components/ui/color-mode";
 import { formatDate } from "@/utils/Helpers";
-import { Box, Center, Flex, Icon, IconButton, Input, InputGroup, Show, Spacer, Stack, Text, VStack } from "@chakra-ui/react";
+import { Box, Center, Flex, Icon, IconButton, Input, InputGroup, Show, Text, VStack } from "@chakra-ui/react";
 import { BsHandIndexThumbFill } from "react-icons/bs";
 import ChatBox from "./ChatBox";
 import { ChatWindowInterface, TriggerMessageInterface } from "./ChatInterfaces";
@@ -11,7 +11,7 @@ import { v4 as uuid } from "uuid";
 import { IoMdSend } from "react-icons/io";
 import ChatHeader from "./ChatHeader";
 import NotificationAlert from "../States/NotificationAlert";
-import { Notification } from "@/custom/interfaces/general/GeneralInterfaces";
+import { Notification } from "@/custom/interfaces/General/GeneralInterfaces";
 
 const ChatWindow = ({selectedChat, user, setChats, setSelectedChat}: ChatWindowInterface) => {
     const { colorMode } = useColorMode();
@@ -65,6 +65,7 @@ const ChatWindow = ({selectedChat, user, setChats, setSelectedChat}: ChatWindowI
             w={"full"} 
             h={"full"}
             direction="column"
+            overflow="hidden"
         >
             <Show
                 when={selectedChat}
@@ -74,7 +75,7 @@ const ChatWindow = ({selectedChat, user, setChats, setSelectedChat}: ChatWindowI
                         flex={1} 
                         textAlign="center" 
                         bg={colorMode == 'light' ? "whiteAlpha.500":"blackAlpha.500"}
-                        color={colorMode == 'light' ? "cyan.600":"pink.600"}
+                        color={colorMode == 'light' ? "teal.400":"pink.600"}
                     >
                         <VStack>
                             <Icon size={"2xl"}>
@@ -92,8 +93,11 @@ const ChatWindow = ({selectedChat, user, setChats, setSelectedChat}: ChatWindowI
                     </Center>
                 }
             >
-                <Stack
-                    h={"full"}
+                <Flex
+                    direction="column" 
+                    h="full"
+                    w="full"
+                    overflow="hidden"
                 >
                     <ChatHeader
                         selectedChat={selectedChat}
@@ -117,19 +121,23 @@ const ChatWindow = ({selectedChat, user, setChats, setSelectedChat}: ChatWindowI
                         }}
                         setChats={setChats}
                     />
-
                     
                     <Box
                         p={3}
+                        flexShrink={0}
                         borderTop="1px solid" 
-                        borderColor={colorMode == 'light' ? 'cyan.600':"pink.600"}
+                        borderColor={colorMode == 'light' ? 'teal.400':"pink.600"}
                         bg={colorMode == 'light' ? "whiteAlpha.500":"blackAlpha.500"}
                     >
                         <Show
                             when={!selectedChat?.isBlocked && !selectedChat?.hasBlockedMe}
                             fallback={
                                 <Center>
-                                    <Text>Can't Send Messages to this User</Text>
+                                    <Text 
+                                        color={colorMode === 'light' ? 'black':'white'}
+                                    >
+                                        Can't Send Messages to this User
+                                    </Text>
                                 </Center>
                             }
                         >
@@ -138,7 +146,7 @@ const ChatWindow = ({selectedChat, user, setChats, setSelectedChat}: ChatWindowI
                                 endElement={
                                     <IconButton 
                                         bg={"transparent"}
-                                        color={colorMode == "light" ? "cyan.600":"pink.600"}
+                                        color={colorMode == "light" ? "teal.400":"pink.600"}
                                         rounded={"full"}
                                         disabled={!user || message.trim() === ""}
                                         size={"sm"}
@@ -152,14 +160,14 @@ const ChatWindow = ({selectedChat, user, setChats, setSelectedChat}: ChatWindowI
                                     value={message}
                                     placeholder="Type your message..."
                                     color={colorMode === "light" ? "black" : "white"}
-                                    borderColor={colorMode === "light" ? "cyan.600" : "pink.600"}
+                                    borderColor={colorMode === "light" ? "teal.400" : "pink.600"}
                                     onChange={(e) => setMessage(e.target.value)}
                                     onKeyDown={handleKeyDown}
                                 />
                             </InputGroup>
                         </Show>
                     </Box>
-                </Stack>
+                </Flex>
             </Show>
 
             <Show

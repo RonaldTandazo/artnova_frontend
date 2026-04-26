@@ -1,21 +1,28 @@
 import { gql } from '@apollo/client/core';
 import { Stats } from '../ArtworkComment/ArtworkStatisticsQueries';
 
+export const ArtVerseArtWorksPayload = gql`
+    fragment ArtVerseArtWork on ArtworkPayload {
+        artworkId
+        title
+        thumbnail
+        publishingId
+        hasImages
+        hasVideos
+        has3DFile
+        owner
+        avatar
+        createdAt
+    }
+`;
+
 export const GET_ARTVERSE_ARTWORKS = gql`    
     query GetArtVerseArtworks{ 
         getArtVerseArtworks{
-            artworkId
-            title
-            thumbnail
-            publishingId
-            hasImages
-            hasVideos
-            has3DFile
-            owner
-            avatar
-            createdAt
+            ...ArtVerseArtWork
         }
     }
+    ${ArtVerseArtWorksPayload}
 `;
 
 export const GET_USER_ARTWORKS = gql`    
@@ -25,8 +32,7 @@ export const GET_USER_ARTWORKS = gql`
             title
             thumbnail
             publishingId
-            scheduleDate
-            scheduleTime
+            scheduleAt
             stats{
                 ...Stats
             }

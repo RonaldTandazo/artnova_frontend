@@ -12,7 +12,14 @@ export interface User {
     countryId: number | null
     city: string | undefined;
     avatar: string | undefined;
+    cover: string | undefined;
 }
+
+export interface UserStats {
+    followersCount: number;
+    followingCount: number;
+}
+
 
 // OPTIONS
 export interface SelectOptions {

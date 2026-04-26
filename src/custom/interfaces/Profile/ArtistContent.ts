@@ -5,8 +5,7 @@ export interface Artwork {
     title: string;
     thumbnail: string;
     publishingId: number;
-    scheduleDate?: string;
-    scheduleTime?: string;
+    scheduleAt?: string | null;
     stats: ArtworkStats
 }
 

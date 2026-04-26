@@ -8,7 +8,7 @@ import ArtVerseButton from "@/custom/Components/FloatingButtons/ArtVerseButton";
 const MainLayout = () => {
     const { colorMode } = useColorMode();
     const location = useLocation();
-    const excludedRoutes = ['/'];
+    const excludedRoutes = ['/', '/Search'];
     const shouldShowButton = !excludedRoutes.includes(location.pathname);
 
     return (

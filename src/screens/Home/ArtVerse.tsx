@@ -1,22 +1,52 @@
 import { Box, Show } from '@chakra-ui/react';
 import ArtVerseGrid from '@/custom/Components/ArtVerse/ArtVerseGrid';
-import { useGlobalState } from '@/context/GlobalContext';
 import LoadingProgress from '@/custom/Components/States/LoadingProgress';
+import { useEffect, useState } from 'react';
+import { useGetArtVerseArtworks } from '@/services/Artwork/ArtworkService';
+import { ArtVerseArtWork } from '@/custom/interfaces/ArtVerse/ArtVerse';
+import Empty from '@/custom/Components/States/Empty';
 
 const ArtVerse = () => {
-  const { loading } = useGlobalState();
+  const [artworks, setArtworks] = useState<ArtVerseArtWork[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const { getArtVerseArtworks, data: artVerseArtworksData } = useGetArtVerseArtworks();
+
+  useEffect(() => {
+    getArtVerseArtworks();
+  }, []);
+
+  useEffect(() => {
+    if (artVerseArtworksData?.getArtVerseArtworks) {
+      setArtworks(artVerseArtworksData.getArtVerseArtworks)
+      setLoading(false)
+    }
+  }, [artVerseArtworksData]);
 
   return (
-    <>
-      <Show 
-        when={loading}
-      >
+    <Show 
+      when={!loading}
+      fallback={
         <LoadingProgress />
-      </Show>
-      <Box>
-        <ArtVerseGrid />
+      }
+    >
+      <Box
+        h={"full"}
+      >
+        <Show
+          when={artworks.length > 0}
+          fallback={
+            <Empty 
+              title="Oooh no!...It seems there are no ArtWorks yet 😢"
+              description="Be the first to publish an amazing one!"
+            />
+          }
+        >
+            <ArtVerseGrid 
+              artworks={artworks}
+            />
+        </Show>
       </Box>
-    </>
+    </Show>
   );
 };
 

@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { IoIosSave } from "react-icons/io";
 import { useChangePassword } from "@/services/User/UserService";
 import { useEffect } from "react";
-import { Notification } from "@/custom/interfaces/general/GeneralInterfaces";
+import { Notification } from "@/custom/interfaces/General/GeneralInterfaces";
 import { ProfileChangePasswordProps, PasswordFormValues } from "@/custom/interfaces/ProfileSettings/ProfileChangePassword";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useColorMode } from "@/components/ui/color-mode";
@@ -86,7 +86,7 @@ const ProfileChangePassword = ({resetAlert, handleNotification}: ProfileChangePa
                     <Button 
                         type="submit" 
                         alignSelf={"flex-end"} 
-                        bg={colorMode === 'light' ? "cyan.600":"pink.600"} 
+                        bg={colorMode === 'light' ? "teal.400":"pink.600"} 
                         color={"white"}
                         loading={passwordLoading}
                         disabled={passwordLoading}

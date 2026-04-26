@@ -1,7 +1,7 @@
 import { CombinedGraphQLErrors } from '@apollo/client/errors';
 import { useLazyQuery } from "@apollo/client/react";
 import { GET_COUNTRIES } from '@/graphql/Country/CountryQueries';
-import { GetCountries } from '@/custom/interfaces/general/GeneralInterfaces';
+import { GetCountries } from '@/custom/interfaces/General/GeneralInterfaces';
 
 export const useGetCountry = () => {
     const [getCountries, { data, loading, error }] = useLazyQuery<GetCountries>(GET_COUNTRIES);

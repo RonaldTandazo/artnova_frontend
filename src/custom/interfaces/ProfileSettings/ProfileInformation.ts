@@ -1,4 +1,4 @@
-import { Notification, SelectOptions, User } from "../general/GeneralInterfaces";
+import { Notification, SelectOptions, User } from "../General/GeneralInterfaces";
 
 export interface ProfileInformationProps{
     user: User | undefined;

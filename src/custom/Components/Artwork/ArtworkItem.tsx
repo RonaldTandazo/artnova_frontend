@@ -1,6 +1,6 @@
 import { useColorMode } from "@/components/ui/color-mode";
 import { Tooltip } from "@/components/ui/tooltip";
-import { BACKEND_URL, encodeToBase64 } from "@/utils/Helpers";
+import { BACKEND_URL, encodeToBase64, formatSchedule } from "@/utils/Helpers";
 import { Box, Grid, GridItem, Icon, Image, Menu, Portal, Separator, Show, Text } from "@chakra-ui/react";
 import { AiFillEdit } from "react-icons/ai";
 import { BiSolidLike } from "react-icons/bi";
@@ -30,18 +30,25 @@ const ArtworkItem = ({
 
     const handleNavigateEditArtwork = (artwork: Artwork) => {
         const encodedArtworkId = encodeToBase64(artwork.artworkId);
-        navigate(`/ArtWorks/${artwork.title}/${encodedArtworkId}/Edit`, { state: { artwork } });
+        const encodedModule = encodeToBase64('EditArtwork');
+
+        const safeArtworkId = encodeURIComponent(encodedArtworkId);
+        const safeModule = encodeURIComponent(encodedModule);
+        
+        navigate(`/ArtWorks/Edit/${safeArtworkId}/${safeModule}`);
     }
 
     const handleNavigateArtworkView = (artwork: Artwork) => {
         const encodedArtworkId = encodeToBase64(artwork.artworkId);
-        navigate(`/ArtWorks/${artwork.title}/${encodedArtworkId}/View`);
+
+        const safeArtworkId = encodeURIComponent(encodedArtworkId);
+
+        navigate(`/ArtWorks/View/${safeArtworkId}`);
     }
 
     const handleCloseMenu = () => {
         onMenuToggle(isOpen ? undefined : artwork.artworkId);
     }
-
     
     const toggleWarningDialog = (artwork: Artwork) => {
         handleCloseMenu();
@@ -80,9 +87,15 @@ const ArtworkItem = ({
                     display={"flex"}
                     alignItems={"center"}
                     justifyContent={"center"}
-                    bg={colorMode === 'light' ? 'cyan.600' : 'pink.600'}
+                    bgGradient={!artwork.thumbnail ? "to-br" : undefined}
+                    gradientFrom={colorMode === 'light' ? "purple.500":"pink.700"} 
+                    gradientTo={colorMode === 'light' ? "teal.400":"cyan.900"}
                     color={'whiteAlpha.950'}
-                    onClick={() => handleNavigateArtworkView(artwork)}
+                    onClick={() => {
+                        if(artwork.publishingId == 1 || artwork.publishingId == 2){
+                            handleNavigateArtworkView(artwork)
+                        }
+                    }}
                 >
                     <Show
                         when={artwork.thumbnail}
@@ -102,6 +115,7 @@ const ArtworkItem = ({
                         />
                     </Show>
                 </Box>
+
                 <Box 
                     p={2} 
                     bg={colorMode === "light" ? "blackAlpha.300":"blackAlpha.950"}
@@ -131,7 +145,7 @@ const ArtworkItem = ({
                                             <Box textAlign="center">
                                                 <Text fontWeight={"semibold"}>Scheduled</Text>
                                                 <Text fontSize="sm">
-                                                    {artwork.scheduleDate} {artwork.scheduleTime}
+                                                    {formatSchedule(artwork.scheduleAt!)}
                                                 </Text>
                                             </Box>
                                         }
@@ -153,7 +167,7 @@ const ArtworkItem = ({
                                 showArrow
                                 contentProps={{ 
                                     css: { 
-                                        "--tooltip-bg": colorMode === "light" ? "colors.cyan.600":"colors.pink.600",
+                                        "--tooltip-bg": colorMode === "light" ? "colors.teal.400":"colors.pink.600",
                                         'color': 'white'
                                     }
                                 }}
@@ -181,7 +195,7 @@ const ArtworkItem = ({
                                 showArrow
                                 contentProps={{ 
                                     css: { 
-                                        "--tooltip-bg": colorMode === "light" ? "colors.cyan.600":"colors.pink.600",
+                                        "--tooltip-bg": colorMode === "light" ? "colors.teal.400":"colors.pink.600",
                                         'color': 'white'
                                     }
                                 }}
@@ -209,7 +223,7 @@ const ArtworkItem = ({
                                 showArrow
                                 contentProps={{ 
                                     css: { 
-                                        "--tooltip-bg": colorMode === "light" ? "colors.cyan.600":"colors.pink.600",
+                                        "--tooltip-bg": colorMode === "light" ? "colors.teal.400":"colors.pink.600",
                                         'color': 'white'
                                     }
                                 }}
@@ -245,6 +259,8 @@ const ArtworkItem = ({
                                     <Portal>
                                         <Menu.Positioner>
                                             <Menu.Content minW={"1px"}>
+                                                <Menu.Arrow />
+
                                                 <Menu.Item 
                                                     value={'edit'}
                                                     justifyContent={'flex-start'}
@@ -252,7 +268,7 @@ const ArtworkItem = ({
                                                     onClick={() => handleNavigateEditArtwork(artwork)}
                                                     cursor={"pointer"}
                                                 >
-                                                    <Icon size={'sm'} color={colorMode === 'light' ? 'cyan.600' : 'pink.600'}>
+                                                    <Icon size={'sm'} color={colorMode === 'light' ? 'teal.400' : 'pink.600'}>
                                                         <AiFillEdit />
                                                     </Icon>
 

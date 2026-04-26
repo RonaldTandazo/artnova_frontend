@@ -21,25 +21,8 @@ const ChatBox = ({openChat, chatId, user, triggerMessage, onToggleNewMessage, se
             
             const exists = lastMessage.userId === newMessage.userId && lastMessage.message == newMessage.message;
             
-            if (exists) {
-                return prevMessages;
-            }
+            if (exists) return prevMessages;
 
-            console.log(newMessage)
-            console.log(newMessage.date)
-            const messageDate = new Date(newMessage!.date);
-
-            setChats(prev => prev.map((c) => {
-                if (c.chatId == chatId) {
-                    return { 
-                        ...c, 
-                        lastMessage: {userId: user.userId, message: newMessage.message, date: formatDate(messageDate)}
-                    };
-                }
-    
-                return c;
-            }));
-            
             return [...prevMessages, newMessage];
         });
 
@@ -52,7 +35,6 @@ const ChatBox = ({openChat, chatId, user, triggerMessage, onToggleNewMessage, se
     });
 
     const messagesContainerRef = useRef<HTMLDivElement>(null);
-    const messagesEndRef = useRef<HTMLDivElement>(null);
     const isScrollingRef = useRef(false);
     const initialLoadRef = useRef(true);
 
@@ -111,6 +93,27 @@ const ChatBox = ({openChat, chatId, user, triggerMessage, onToggleNewMessage, se
         }
     }, [triggerMessage])
 
+    useEffect(() => {
+        if (messages.length > 0 && setChats) {
+            const lastMsg = messages[messages.length - 1];
+            const messageDate = new Date(lastMsg.date);
+
+            setChats(prev => prev.map((c) => {
+                if (c.chatId === chatId) {
+                    return { 
+                        ...c, 
+                        lastMessage: {
+                            userId: lastMsg.userId, 
+                            message: lastMsg.message, 
+                            date: formatDate(messageDate)
+                        }
+                    };
+                }
+                return c;
+            }));
+        }
+    }, [messages, chatId, setChats]);
+
     const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
         const container = e.currentTarget;
         
@@ -126,10 +129,15 @@ const ChatBox = ({openChat, chatId, user, triggerMessage, onToggleNewMessage, se
     };
 
     const scrollToBottom = () => {
-        if (!messagesEndRef.current || !openChat) return;
+        const container = messagesContainerRef.current;
+        if (!container || !openChat) return;
         
         isScrollingRef.current = true;
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+
+        container.scrollTo({
+            top: container.scrollHeight,
+            behavior: "smooth"
+        });
 
         setTimeout(() => {
             isScrollingRef.current = false;
@@ -153,12 +161,14 @@ const ChatBox = ({openChat, chatId, user, triggerMessage, onToggleNewMessage, se
         <VStack
             flex={1}
             align="stretch"
-            h={"80%"}
+            minH={0}
+            h="full"
+            overflow="hidden"
         >
             <Box
                 padding={5}
                 w={"full"}
-                h={"full"}
+                flex={1}
                 display="flex" 
                 flexDirection="column" 
                 overflowY="auto"
@@ -176,12 +186,10 @@ const ChatBox = ({openChat, chatId, user, triggerMessage, onToggleNewMessage, se
                         <ChatMessage
                             key={msg.messageId}
                             message={msg}
-                            currentUserId={user?.userId}
+                            currentUserId={user!.userId}
                         />
                     )}
                 </For>
-                
-                <Box ref={messagesEndRef} />
             </Box>
         </VStack>
     );

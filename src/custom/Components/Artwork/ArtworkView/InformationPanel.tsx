@@ -122,7 +122,7 @@ const InformationPanel = ({user, artworkData, artworkStatistics, onLike, onDisLi
                             display={"flex"}
                             alignItems={"center"}
                             justifyContent={"center"}
-                            bg={colorMode === 'light' ? 'cyan.600' : 'pink.600'}
+                            bg={colorMode === 'light' ? 'teal.400' : 'pink.600'}
                             color={'whiteAlpha.950'}
                         >
                             <Icon
@@ -218,7 +218,7 @@ const InformationPanel = ({user, artworkData, artworkStatistics, onLike, onDisLi
                         <Link
                             variant="plain" 
                             href={toProfile(artworkData?.owner.userId)} 
-                            color={colorMode == "light" ? "cyan.600":"pink.600"}
+                            color={colorMode == "light" ? "teal.400":"pink.600"}
                         >
                             <Avatar.Root key={"subtle"} variant={"subtle"}>
                                 <Avatar.Fallback name={artworkData?.owner.username} />
@@ -229,7 +229,7 @@ const InformationPanel = ({user, artworkData, artworkStatistics, onLike, onDisLi
                             <Link
                                 variant="plain" 
                                 href={toProfile(artworkData?.owner.userId)} 
-                                color={colorMode == "light" ? "cyan.600":"pink.600"}
+                                color={colorMode == "light" ? "teal.400":"pink.600"}
                             >
                                 {artworkData?.owner.username}
                             </Link>

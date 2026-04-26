@@ -1,5 +1,5 @@
 import { useColorMode } from "@/components/ui/color-mode";
-import { SelectOptions } from "@/custom/interfaces/general/GeneralInterfaces";
+import { SelectOptions } from "@/custom/interfaces/General/GeneralInterfaces";
 import { SearchableSelectProps } from "@/custom/interfaces/Searchable/SearchableSelect";
 import {
   Select,
@@ -42,7 +42,6 @@ const SearchableSelect = ({
 
     useEffect(() => {
         setFilteredOptions(options);
-        console.log(options)
         if (defaultValue && options.length > 0) {
             const values = Array.isArray(defaultValue) ? defaultValue : [defaultValue];
 
@@ -128,7 +127,7 @@ const SearchableSelect = ({
                 <Select.IndicatorGroup>
                     <Select.ClearTrigger
                         onClick={handleClear}
-                        color={colorMode === "light" ? "cyan.600" : "pink.600"}
+                        color={colorMode === "light" ? "teal.400" : "pink.600"}
                         bg="transparent"
                     />
                     <Select.Indicator />

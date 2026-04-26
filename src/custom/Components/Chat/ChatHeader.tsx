@@ -9,6 +9,9 @@ import { CgUnblock } from "react-icons/cg";
 import { ChatHeaderInterface } from "./ChatInterfaces"
 import { useDeleteChat } from "@/services/Chat/ChatService"
 import { useSetBlockState, useUnsetBlockState } from "@/services/Block/BlockService"
+import WarningDialog from "../Dialogs/WarningDialog"
+import { useState } from "react"
+import { DeleteItem } from "@/custom/interfaces/Dialogs/WarningDialog"
 
 const ChatHeader = ({selectedChat, user, setChats, setSelectedChat, onShowMessage}: ChatHeaderInterface) => {
     const { colorMode } = useColorMode();
@@ -17,18 +20,25 @@ const ChatHeader = ({selectedChat, user, setChats, setSelectedChat, onShowMessag
     const { setBlockState } = useSetBlockState();
     const { unsetBlockState } = useUnsetBlockState();
     const { deleteChat } = useDeleteChat();
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+    const [deleteItems, setDeleteItems] = useState<DeleteItem[]>([]);
+    const [data, setData] = useState<{title: string, message: string, complete: () => void} | undefined>(undefined);
 
     const handleNavigateProfile = (userId: number) => {
         const isOwn = user && userId === user.userId;
         const encodedUserId = encodeToBase64(userId);
         const encodedModule = encodeToBase64(isOwn ? 'OwnProfile' : 'VisitProfile');
 
-        return `/Profile/${encodedUserId}/${encodedModule}`
+        const safeUserId = encodeURIComponent(encodedUserId);
+        const safeModule = encodeURIComponent(encodedModule);
+
+        return `/Profile/${safeUserId}/${safeModule}`
     }
 
-    const handleFollowState = (state: boolean) => {
+    const handleFollowState = (state: boolean, isSimple: boolean = true) => {
         const data = {
-            followedId: selectedChat!.artist.artistId
+            followedId: selectedChat!.artist.artistId,
+            simple: isSimple
         }
 
         setChats(prev => prev.map((c) => {
@@ -79,7 +89,7 @@ const ChatHeader = ({selectedChat, user, setChats, setSelectedChat, onShowMessag
                     });
                 }
 
-                handleFollowState(!state)
+                handleFollowState(!state, false)
             } else {
                 const { data: resData } = await unsetBlockState(data);
                 if (resData) {
@@ -110,112 +120,144 @@ const ChatHeader = ({selectedChat, user, setChats, setSelectedChat, onShowMessag
         }
     }
 
+    const toggleWarningDialog = (type: 'delete' | 'block' | 'unblock') => {
+        setData({
+            title: type == 'block' ? "Block User" : (type == 'unblock' ? "Unblock User" : "Delete Chat"),
+            message: type == 'block' ? `Are you sure you want to block those artists? This will also unfollow them if you are currently following them.` : (type == 'unblock' ? `Are you sure you want to unblock those artists?` : `Are you sure you want to delete the chat with those artists?`),
+            complete: () => {
+                handleClose();
+                type == 'block' || type == 'unblock' ? handleBlockUser(type == 'block') : handleDeleteChat();
+            }
+        })
+        setIsModalOpen(true);
+        setDeleteItems(prev => [...prev, {id: selectedChat!.artist.artistId, name: selectedChat!.artist.username}])
+    }
+
+    const handleClose = () => {
+        setData(undefined)
+        setIsModalOpen(false);
+        setDeleteItems([])
+    };
+
     return (
-        <Flex
-            p={4.5}
-            gap={3}
-            shadow={"md"}
-            alignItems={"center"}
-            bg={colorMode == 'light' ? 'cyan.50':"pink.50"}
-        >
-            <Avatar.Root key={"subtle"} variant={"subtle"}>
-                <Show
-                    when={selectedChat?.artist.avatar}
-                    fallback={
-                        <Avatar.Fallback name={selectedChat?.artist.username} />
-                    }
-                >
-                    <Avatar.Image src={`${BACKEND_URL}/avatars/${selectedChat?.artist.avatar}`} />
-                </Show>
-            </Avatar.Root>
-
-            <Link 
-                variant="plain" 
-                href={
-                    (!selectedChat?.isBlocked && !selectedChat?.hasBlockedMe) ? handleNavigateProfile(selectedChat!.artist!.artistId):'#'
-                } 
-                color={colorMode == "light" ? "cyan.600":"pink.600"}
+        <>
+            <Flex
+                px={4}
+                gap={3}
+                shadow={"md"}
+                alignItems={"center"}
+                bg={colorMode == 'light' ? 'teal.50':"pink.50"}
+                h={"65px"}
+                flexShrink={0}
             >
-                <Text 
-                    fontSize="2xl" 
-                    fontWeight="bold"
-                    color={colorMode == 'light' ? "cyan.600":"pink.600"}
-                >
-                    {selectedChat?.artist.username}
-                </Text>
-            </Link>
-
-            <Spacer />
-
-            <Menu.Root lazyMount>
-                <Menu.Trigger asChild>
-                    <Icon
-                        color={colorMode == "light" ? "cyan.600":"pink.600"}
-                        size={"lg"}
-                        cursor={"pointer"}
+                <Avatar.Root key={"subtle"} variant={"subtle"}>
+                    <Show
+                        when={selectedChat?.artist.avatar}
+                        fallback={
+                            <Avatar.Fallback name={selectedChat?.artist.username} />
+                        }
                     >
-                        <BsThreeDotsVertical />
-                    </Icon>
-                </Menu.Trigger>
-                <Portal>
-                    <Menu.Positioner>
-                        <Menu.Content zIndex={"toast"}>
-                            <Show
-                                when={!selectedChat!.isBlocked && !selectedChat!.hasBlockedMe}
-                            >
-                                <Menu.Item 
-                                    value="follow-user"
-                                    cursor={"pointer"}
-                                    onClick={() => handleFollowState(!selectedChat!.isFollowing)}
+                        <Avatar.Image src={`${BACKEND_URL}/avatars/${selectedChat?.artist.avatar}`} />
+                    </Show>
+                </Avatar.Root>
+
+                <Link 
+                    variant="plain" 
+                    href={
+                        (!selectedChat?.isBlocked && !selectedChat?.hasBlockedMe) ? handleNavigateProfile(selectedChat!.artist!.artistId):'#'
+                    } 
+                    color={colorMode == "light" ? "teal.400":"pink.600"}
+                >
+                    <Text 
+                        fontSize="2xl" 
+                        fontWeight="bold"
+                        color={colorMode == 'light' ? "teal.400":"pink.600"}
+                    >
+                        {selectedChat?.artist.username}
+                    </Text>
+                </Link>
+
+                <Spacer />
+
+                <Menu.Root lazyMount>
+                    <Menu.Trigger asChild>
+                        <Icon
+                            color={colorMode == "light" ? "teal.400":"pink.600"}
+                            size={"lg"}
+                            cursor={"pointer"}
+                        >
+                            <BsThreeDotsVertical />
+                        </Icon>
+                    </Menu.Trigger>
+                    <Portal>
+                        <Menu.Positioner>
+                            <Menu.Content zIndex={"toast"}>
+                                <Show
+                                    when={!selectedChat!.isBlocked && !selectedChat!.hasBlockedMe}
                                 >
-                                    <Show
-                                        when={!selectedChat!.isFollowing}
-                                        fallback={
-                                            <>
-                                                <PiUserMinusFill /> Unfollow
-                                            </>
-                                        }
+                                    <Menu.Item 
+                                        value="follow-user"
+                                        cursor={"pointer"}
+                                        onClick={() => handleFollowState(!selectedChat!.isFollowing)}
                                     >
-                                        <PiUserPlusFill /> Follow
-                                    </Show>
-                                </Menu.Item>
-                            </Show>
-                            <Show
-                                when={!selectedChat!.hasBlockedMe}
-                            >
+                                        <Show
+                                            when={!selectedChat!.isFollowing}
+                                            fallback={
+                                                <>
+                                                    <PiUserMinusFill /> Unfollow
+                                                </>
+                                            }
+                                        >
+                                            <PiUserPlusFill /> Follow
+                                        </Show>
+                                    </Menu.Item>
+                                </Show>
+                                <Show
+                                    when={!selectedChat!.hasBlockedMe}
+                                >
+                                    <Menu.Item 
+                                        value="block-user"
+                                        cursor={"pointer"}
+                                        color="fg.error"
+                                        _hover={{ bg: "bg.error", color: "fg.error" }}
+                                        onClick={() => toggleWarningDialog(!selectedChat!?.isBlocked ? 'block' : 'unblock')}
+                                    >
+                                        <Show
+                                            when={!selectedChat!?.isBlocked}
+                                            fallback={
+                                                <>
+                                                    <CgUnblock /> Unblock User
+                                                </>
+                                            }
+                                        >
+                                            <MdBlock /> Block User
+                                        </Show>
+                                    </Menu.Item>
+                                </Show>
                                 <Menu.Item 
-                                    value="block-user"
+                                    value="delete-chat"
                                     cursor={"pointer"}
                                     color="fg.error"
                                     _hover={{ bg: "bg.error", color: "fg.error" }}
-                                    onClick={() => handleBlockUser(!selectedChat!?.isBlocked)}
+                                    onClick={() => toggleWarningDialog('delete')}
                                 >
-                                    <Show
-                                        when={!selectedChat!?.isBlocked}
-                                        fallback={
-                                            <>
-                                                <CgUnblock /> Unblock User
-                                            </>
-                                        }
-                                    >
-                                        <MdBlock /> Block User
-                                    </Show>
+                                    <MdDelete /> Delete Chat
                                 </Menu.Item>
-                            </Show>
-                            <Menu.Item 
-                                value="delete-chat"
-                                cursor={"pointer"}
-                                color="fg.error"
-                                _hover={{ bg: "bg.error", color: "fg.error" }}
-                                onClick={handleDeleteChat}
-                            >
-                                <MdDelete /> Delete Chat
-                            </Menu.Item>
-                        </Menu.Content>
-                    </Menu.Positioner>
-                </Portal>
-            </Menu.Root>
-        </Flex>
+                            </Menu.Content>
+                        </Menu.Positioner>
+                    </Portal>
+                </Menu.Root>
+            </Flex>
+
+            <WarningDialog
+                isOpen={isModalOpen}
+                title={data?.title}
+                message={data?.message}
+                items={deleteItems}
+                onClose={handleClose}
+                onComplete={data ? data?.complete : handleClose}
+            />
+        </>
     )
 }
 

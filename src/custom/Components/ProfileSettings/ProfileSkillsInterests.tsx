@@ -3,7 +3,7 @@ import { IoIosSave } from "react-icons/io";
 import { useEffect, useState } from "react";
 import { ProfileSkillsInterestsProps } from "@/custom/interfaces/ProfileSettings/ProfileSkillsInterests";
 import SearchableInput from "../Searchable/SearchableInput";
-import { Notification, SelectOptions } from "@/custom/interfaces/general/GeneralInterfaces";
+import { Notification, SelectOptions } from "@/custom/interfaces/General/GeneralInterfaces";
 import { useGetUserSkills, useStoreUserSkills } from "@/services/UserSkills/UserSkillService";
 import { useColorMode } from "@/components/ui/color-mode";
 import LoadingProgress from "../States/LoadingProgress";
@@ -118,7 +118,6 @@ const ProfileSkillsInterests = ({skillsLoading, categories, topics, softwares, r
                 <LoadingProgress/>
             }
         >
-
             <Stack p={7}>
                 <Box w={"full"}>
                     <Box w={"full"} mb={3}>
@@ -153,7 +152,7 @@ const ProfileSkillsInterests = ({skillsLoading, categories, topics, softwares, r
                                         <CheckboxCard.Root
                                             key={item.value}
                                             variant={"outline"}
-                                            colorPalette={colorMode === "light" ? "cyan" : "pink"}
+                                            colorPalette={colorMode === "light" ? "teal.400" : "pink"}
                                             onCheckedChange={() => handleCategoryChange(Number(item.value))}
                                             checked={selectedCategories.includes(Number(item.value))}
                                             cursor="pointer"
@@ -189,14 +188,14 @@ const ProfileSkillsInterests = ({skillsLoading, categories, topics, softwares, r
                                 >
                                     <For each={selectedTopic}>
                                         {(item) => (
-                                            <Card.Root size="sm" key={item.value} borderWidth={"2px"} borderColor={colorMode === "light" ? "cyan.600":"pink.600"}>
+                                            <Card.Root size="sm" key={item.value} borderWidth={"2px"} borderColor={colorMode === "light" ? "teal.400":"pink.600"}>
                                                 <Card.Body display={"flex"} justifyContent={"center"}>
                                                     <Flex justifyContent={"space-between"} alignItems={"center"}>
                                                         <Heading size="sm">{item.label}</Heading>
                                                         <IconButton
                                                             onClick={() => handleTopicChange(item, "remove")} 
                                                             size={"2xs"} 
-                                                            bg={colorMode === "light" ? "cyan.600":"pink.600"}   
+                                                            bg={colorMode === "light" ? "teal.400":"pink.600"}   
                                                             color={"white"} 
                                                             justifyContent={"center"}
                                                             alignItems={"center"}
@@ -234,14 +233,14 @@ const ProfileSkillsInterests = ({skillsLoading, categories, topics, softwares, r
                                 >
                                     <For each={selectedSoftware}>
                                         {(item) => (
-                                            <Card.Root size="sm" key={item.value} borderWidth={"2px"} borderColor={colorMode === "light" ? "cyan.600":"pink.600"}>
+                                            <Card.Root size="sm" key={item.value} borderWidth={"2px"} borderColor={colorMode === "light" ? "teal.400":"pink.600"}>
                                                 <Card.Body display={"flex"} justifyContent={"center"}>
                                                     <Flex justifyContent={"space-between"} alignItems={"center"}>
                                                         <Heading size="md">{item.label}</Heading>
                                                         <IconButton
                                                             onClick={() => handleSoftwareChange(item, "remove")} 
                                                             size={"2xs"} 
-                                                            bg={colorMode === "light" ? "cyan.600":"pink.600"}   
+                                                            bg={colorMode === "light" ? "teal.400":"pink.600"}   
                                                             color={"white"} 
                                                             justifyContent={"center"}
                                                             alignItems={"center"}
@@ -261,7 +260,7 @@ const ProfileSkillsInterests = ({skillsLoading, categories, topics, softwares, r
 
                         <Button
                             alignSelf={"flex-end"} 
-                            bg={colorMode === 'light' ? "cyan.600":"pink.600"} 
+                            bg={colorMode === 'light' ? "teal.400":"pink.600"} 
                             color={"white"}
                             loading={storeUserSkillsLoading}
                             disabled={storeUserSkillsLoading}

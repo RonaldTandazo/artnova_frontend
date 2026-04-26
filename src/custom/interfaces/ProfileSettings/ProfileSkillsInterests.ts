@@ -1,4 +1,4 @@
-import { Notification, SelectOptions } from "../general/GeneralInterfaces";
+import { Notification, SelectOptions } from "../General/GeneralInterfaces";
 
 export interface ProfileSkillsInterestsProps {
     skillsLoading: boolean;

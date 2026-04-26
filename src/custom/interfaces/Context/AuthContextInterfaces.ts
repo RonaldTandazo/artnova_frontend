@@ -1,4 +1,4 @@
-import { User } from "../general/GeneralInterfaces";
+import { User } from "../General/GeneralInterfaces";
 import { ApolloError } from '@apollo/client';
 
 export interface AuthContextType {
