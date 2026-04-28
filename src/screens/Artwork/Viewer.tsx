@@ -47,9 +47,9 @@ function Escena3D({ objUrl, mtlUrl, setLoading }: any) {
 }
 
 const Viewer = () => {
-    const [objUrl, setObjUrl] = useState(null);
-    const [mtlUrl, setMtlUrl] = useState(null);
-    const [loading, setLoading] = useState(false);
+    const [objUrl, setObjUrl] = useState<any>(null);
+    const [mtlUrl, setMtlUrl] = useState<any>(null);
+    const [loading, setLoading] = useState<any>(false);
 
     const handleObjFileChange = (event: ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
