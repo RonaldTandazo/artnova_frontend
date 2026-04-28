@@ -25,7 +25,7 @@ export interface ChatBoxInterface {
     user: User | undefined
     triggerMessage: TriggerMessageInterface
     onToggleNewMessage: () => void
-    setChats: Dispatch<SetStateAction<ChatItemInterface[]>>;
+    setChats: Dispatch<SetStateAction<ChatItemInterface[]>> | undefined;
 }
 
 export interface ChatSidebarInterface {

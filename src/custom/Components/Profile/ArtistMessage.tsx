@@ -108,6 +108,7 @@ const ArtistMessage = ({ artist, user, openChat, onToggleChat }: ArtistMessagePr
                                         newMessage: undefined
                                     })
                                 }}
+                                setChats={undefined}
                             />
                         </Drawer.Body>
                         

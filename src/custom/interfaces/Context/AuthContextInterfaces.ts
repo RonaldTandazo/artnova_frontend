@@ -1,5 +1,5 @@
 import { User } from "../General/GeneralInterfaces";
-import { ApolloError } from '@apollo/client';
+// import { ApolloError } from '@apollo/client';
 
 export interface AuthContextType {
     isAuthenticated: boolean;
@@ -10,6 +10,6 @@ export interface AuthContextType {
     token: string | null;
     user: User | undefined;
     loading: boolean;
-    error: null | ApolloError;
+    error: any;
     clearError: () => void;
 }

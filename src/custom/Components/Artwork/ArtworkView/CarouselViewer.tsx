@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Box, Flex, For, IconButton, Image, Show } from '@chakra-ui/react';
 import { MdArrowBackIosNew, MdArrowForwardIos } from 'react-icons/md';
 import { BACKEND_URL } from '@/utils/Helpers';
@@ -10,11 +10,24 @@ const CarouselViewer = ({ type, files = []} : {
     const [currentSlide, setCurrentSlide] = useState(0);
     const slidesCount = files.length;
 
+    const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+
+    const pauseAllVideos = () => {
+        videoRefs.current.forEach(video => {
+            if (video) {
+                video.pause();
+                video.currentTime = 0;
+            }
+        });
+    };
+
     const prevSlide = () => {
+        pauseAllVideos();
         setCurrentSlide((s) => (s === 0 ? slidesCount - 1 : s - 1));
     };
 
     const nextSlide = () => {
+        pauseAllVideos();
         setCurrentSlide((s) => (s === slidesCount - 1 ? 0 : s + 1));
     };
 
@@ -58,13 +71,17 @@ const CarouselViewer = ({ type, files = []} : {
                             <Show
                                 when={type == 'videos'}
                             >
-                                <Box
-                                    as="video"
+                                <video
+                                    ref={(el) => {
+                                        videoRefs.current[index] = el;
+                                    }}
                                     src={`${BACKEND_URL}/videos/${file}`}
                                     controls
-                                    objectFit="contain"
-                                    maxH="full"
-                                    w="full"
+                                    style={{
+                                        objectFit: 'contain',
+                                        maxHeight: '100%',
+                                        width: '100%',
+                                    }}
                                 />
                             </Show>
                         </Flex>
@@ -123,7 +140,10 @@ const CarouselViewer = ({ type, files = []} : {
                                 borderRadius="full"
                                 bg={index === currentSlide ? "white" : "whiteAlpha.500"}
                                 cursor="pointer"
-                                onClick={() => setCurrentSlide(index)}
+                                onClick={() => {
+                                    pauseAllVideos();
+                                    setCurrentSlide(index);
+                                }}
                                 transition="background-color 0.3s"
                             />
                         )}

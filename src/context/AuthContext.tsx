@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
 import { useLogin, useSignUp, useRefreshToken, useRevokeToken } from '../services/Authentication/AuthenticationService';
 import { useNavigate } from 'react-router-dom';
-import { ApolloError } from '@apollo/client';
+// import { ApolloError } from '@apollo/client';
 import { setAuthCallbacks } from '@/utils/ApolloClient';
 import { User } from '@/custom/interfaces/General/GeneralInterfaces';
 import { AuthContextType } from '@/custom/interfaces/Context/AuthContextInterfaces';
@@ -15,7 +15,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [accessToken, setAccessToken] = useState<string | null>(null);
     const [refreshToken, setRefreshToken] = useState<string | null>(localStorage.getItem('refreshToken'));
     const [loading, setLoading] = useState<boolean>(true);
-    const [errorMessage, setErrorMessage] = useState<null | ApolloError>(null);
+    const [errorMessage, setErrorMessage] = useState<any>(null);
 
     // 2. Hooks y Referencias
     const { signUp: SignUp, error: signUpError } = useSignUp();
@@ -240,11 +240,11 @@ const isTokenExpired = (token: string) => {
     return Date.now() >= decoded.exp * 1000;
 };
 
-const hasRememberMe = (token: string) => {
-    const decoded = decodeToken(token);
-    if(decoded.rememberMe){
-        return true;
-    }
+// const hasRememberMe = (token: string) => {
+//     const decoded = decodeToken(token);
+//     if(decoded.rememberMe){
+//         return true;
+//     }
 
-    return false;
-};
+//     return false;
+// };
