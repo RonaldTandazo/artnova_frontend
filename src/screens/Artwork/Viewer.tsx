@@ -10,27 +10,27 @@ function ModeloOBJ({ objUrl, mtlUrl, setLoading }: any) {
     const obj = useLoader(OBJLoader, objUrl);
     const materials = useLoader(MTLLoader, mtlUrl);
 
-    useEffect(() => {
-        if (materials) {
-            materials.preload();
-            obj.children.forEach((child: any) => {
-                //if (child instanceof THREE.Mesh) {
-                    if (Array.isArray(child.material)) {
-                        child.material = child.material.map((mat) => {
-                            if (mat && mat.name && materials.materials[mat.name]) {
-                                return materials.materials[mat.name];
-                            }
-                            return mat;
-                        });
-                    } else if (child.material && child.material.name && materials.materials[child.material.name]) {
-                        child.material = materials.materials[child.material.name];
-                    }
-                //}
-            })
-        }
+    // useEffect(() => {
+    //     if (materials) {
+    //         materials.preload();
+    //         obj.children.forEach((child: any) => {
+    //             //if (child instanceof THREE.Mesh) {
+    //                 if (Array.isArray(child.material)) {
+    //                     child.material = child.material.map((mat) => {
+    //                         if (mat && mat.name && materials.materials[mat.name]) {
+    //                             return materials.materials[mat.name];
+    //                         }
+    //                         return mat;
+    //                     });
+    //                 } else if (child.material && child.material.name && materials.materials[child.material.name]) {
+    //                     child.material = materials.materials[child.material.name];
+    //                 }
+    //             //}
+    //         })
+    //     }
 
-        setLoading(false)
-    }, [obj, materials]);
+    //     setLoading(false)
+    // }, [obj, materials]);
 
     return <primitive object={obj} dispose={null} />;
 }
