@@ -26,8 +26,7 @@ const SearchableSelect = ({
     const [selectedOptions, setSelectedOptions] = useState<string | undefined>(undefined);
     const [searchTerm, setSearchTerm] = useState<string>("");
 
-    const collection = useMemo(
-        () =>
+    const collection = useMemo(() =>
         createListCollection({
             items: filteredOptions
         }),

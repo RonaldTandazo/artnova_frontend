@@ -1,18 +1,26 @@
 import { useColorMode } from "@/components/ui/color-mode";
-import { Select, Input, Box, Portal, For } from "@chakra-ui/react";
-import { useState, useRef, useEffect } from "react";
+import { SelectOptions } from "@/custom/interfaces/General/GeneralInterfaces";
+import { SearchableInputProps } from "@/custom/interfaces/Searchable/SearchableInput";
+import { Select, Input, Box, Portal, For, createListCollection } from "@chakra-ui/react";
+import { useState, useRef, useEffect, useMemo } from "react";
 
-type Option = {
-    value: number,
-    label: string,
-}
-
-const SearchableInput = ({ disabled = false, placeholder = "Select Options", options, onSelect, ...rest }: any) => {
-    const [filteredOptions, setFilteredOptions] = useState<Option[]>([]);
+const SearchableInput = ({ 
+    placeholder = "Select Options",
+    options = [],
+    onSelect,
+}: SearchableInputProps) => {
+    const [filteredOptions, setFilteredOptions] = useState<SelectOptions[]>(options);
     const { colorMode } = useColorMode();
     const [searchTerm, setSearchTerm] = useState("");
     const [isOpen, setIsOpen] = useState(false);
     const ref = useRef(null);
+
+    const collection = useMemo(() =>
+        createListCollection({
+            items: filteredOptions
+        }),
+        [filteredOptions]
+    );
 
     useEffect(() => {
         if(filteredOptions.length <= 0){
@@ -20,28 +28,31 @@ const SearchableInput = ({ disabled = false, placeholder = "Select Options", opt
         }
     }, [options]);
 
-    const handleSearch = (term:string) => {
+    const handleSearch = (term: string) => {
         setSearchTerm(term);
         setFilteredOptions(
-            options.filter((option:any) =>
+            options.filter((option) =>
                 option.label.toLowerCase().includes(term)
             )
         );
     };
 
-    const handleOnSelect = (option:any) => {
+    const handleOnSelect = (option: SelectOptions) => {
         handleSearch("")
         onSelect(option, "add")
     }
 
-    const onBlur = (e: any) => {
+    const onBlur = () => {
         setSearchTerm("")
         setFilteredOptions(options)
     }
 
     return ( 
-        <Select.Root>
-            <Select.HiddenSelect {...rest} />
+        <Select.Root
+            collection={collection}
+        >
+            <Select.HiddenSelect />
+
             <Select.Control>
                 <Select.Trigger onClick={() => {setIsOpen(true)}} bg={"transparent"} border={"solid thin"} borderColor={colorMode === "light" ? "gray.200" : "whiteAlpha.300"} rounded={"sm"} onBlur={onBlur}>
                     <Select.ValueText>
