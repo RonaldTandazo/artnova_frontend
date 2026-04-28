@@ -18,7 +18,7 @@ const SearchPage = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [results, setResults] = useState<Results>({artworks: [], artists: []});
     const [pageArtworks, setPageArtworks] = useState<number>(1);
-    const [pageArtists, setPageArtists] = useState<number>(1);
+    const [_, setPageArtists] = useState<number>(1);
     const [hasMoreArtworks, setHasMoreArtworks] = useState<boolean>(false);
     const [loadingArtworks, setLoadingArtworks] = useState<boolean>(false);
     const [openDrawer, setOpenDrawer] = useState<boolean>(false)

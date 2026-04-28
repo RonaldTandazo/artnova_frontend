@@ -3,17 +3,17 @@ import { Canvas, useLoader } from "@react-three/fiber";
 import { OBJLoader, MTLLoader } from "three-stdlib";
 import { Box, Button, FileUpload, Heading, Icon, Show } from "@chakra-ui/react";
 import { LuUpload } from "react-icons/lu";
-import { useGLTF, OrbitControls, Stars } from '@react-three/drei';
+import { OrbitControls } from '@react-three/drei';
 import LoadingProgress from "@/custom/Components/States/LoadingProgress";
 
-function ModeloOBJ({ objUrl, mtlUrl, setLoading }) {
+function ModeloOBJ({ objUrl, mtlUrl, setLoading }: any) {
     const obj = useLoader(OBJLoader, objUrl);
     const materials = useLoader(MTLLoader, mtlUrl);
 
     useEffect(() => {
         if (materials) {
             materials.preload();
-            obj.children.forEach((child) => {
+            obj.children.forEach((child: any) => {
                 //if (child instanceof THREE.Mesh) {
                     if (Array.isArray(child.material)) {
                         child.material = child.material.map((mat) => {
@@ -35,7 +35,7 @@ function ModeloOBJ({ objUrl, mtlUrl, setLoading }) {
     return <primitive object={obj} dispose={null} />;
 }
 
-function Escena3D({ objUrl, mtlUrl, setLoading }) {
+function Escena3D({ objUrl, mtlUrl, setLoading }: any) {
     return (
         <Canvas>
             <ambientLight intensity={0.5} />
