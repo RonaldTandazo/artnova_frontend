@@ -1,3 +1,4 @@
+import { SceneConfig } from "@/custom/interfaces/3DFile/Upload3DFile";
 import { Time } from "@internationalized/date"
 
 export const BACKEND_URL = import.meta.env.VITE_API_URL;
@@ -100,3 +101,29 @@ export const formatTime = (time: Time) => `${String(time.hour).padStart(2, "0")}
 export const formatWeekday = (date: Date) => date.toLocaleDateString("en-US", { weekday: "long" })
 
 export const formatMonthDay = (date: Date) => date.toLocaleDateString("en-US", { month: "long", day: "numeric" })
+
+export const FACTORY_SETTINGS: SceneConfig = {
+    intensity: [1],
+    environment: ['city'],
+    contactShadow: true,
+    exposure: [1],
+    modelColor: '#ffffff',
+    backgroundColor: '#050505',
+    autoRotate: false,
+    lightPosition: [5, 5, 5],
+    lockCameraReset: false,
+    lockInteraction: false
+};
+
+export const settingsOptions = [
+    { id: 'light-x', label: 'Light X Axis', component: 'light' },
+    { id: 'light-y', label: 'Light Y Axis', component: 'light' },
+    { id: 'light-z', label: 'Light Z Axis', component: 'light' },
+    { id: 'intensity', label: 'Lighting Intensity', component: 'intensity' },
+    { id: 'exposure', label: 'Exposure', component: 'exposure' },
+    { id: 'shadows', label: 'Contact Shadows', component: 'shadows' },
+    { id: 'rotate', label: 'Auto Rotate', component: 'rotate' },
+    { id: 'framing', label: 'Fixed Framing (Stage)', component: 'framing' },
+    { id: 'freeze', label: 'Freeze Mouse (Orbit)', component: 'freeze' },
+    { id: 'bg-color', label: 'Background Color', component: 'color' },
+];

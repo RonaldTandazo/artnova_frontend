@@ -1,10 +1,10 @@
 import { Box, Show } from '@chakra-ui/react';
-import ArtVerseGrid from '@/custom/Components/ArtVerse/ArtVerseGrid';
-import LoadingProgress from '@/custom/Components/States/LoadingProgress';
+import ArtVerseGrid from '@/custom/components/ArtVerse/ArtVerseGrid';
+import LoadingProgress from '@/custom/components/States/LoadingProgress';
 import { useEffect, useState } from 'react';
 import { useGetArtVerseArtworks } from '@/services/Artwork/ArtworkService';
 import { ArtVerseArtWork } from '@/custom/interfaces/ArtVerse/ArtVerse';
-import Empty from '@/custom/Components/States/Empty';
+import Empty from '@/custom/components/States/Empty';
 
 const ArtVerse = () => {
   const [artworks, setArtworks] = useState<ArtVerseArtWork[]>([]);

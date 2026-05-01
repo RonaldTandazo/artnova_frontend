@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BiLogIn } from "react-icons/bi";
 import { useColorMode } from "@/components/ui/color-mode";
-import NotificationAlert from "@/custom/Components/States/NotificationAlert";
+import NotificationAlert from "@/custom/components/States/NotificationAlert";
 
 interface FormValues {
     username: string;

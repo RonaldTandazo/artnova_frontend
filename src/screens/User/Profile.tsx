@@ -9,13 +9,13 @@ import { useGetUserSocialMedia } from "@/services/UserSocialNetwork/UserSocialNe
 import { useDeleteUserArtworks, useGetUserArtworks } from "@/services/Artwork/ArtworkService";
 import { useSubscription } from "@apollo/client/react";
 import { NEW_ARTWORK_SUBSCRIPTION } from "@/graphql/Artwork/ArtworkSubscription";
-import LoadingProgress from "@/custom/Components/States/LoadingProgress";
+import LoadingProgress from "@/custom/components/States/LoadingProgress";
 import { decodeFromBase64, encodeToBase64 } from "@/utils/Helpers";
 import { useGetUserData, useGetUserStatsData } from "@/services/User/UserService";
 import { GeneralInfoInterface } from "@/graphql/User/UserInterfaces";
 import { useGetFollowState, useSetFollowState, useUnsetFollowState } from "@/services/Follow/FollowService";
-import ArtistSidebar from "@/custom/Components/Profile/ArtistSidebar";
-import ArtistContent from "@/custom/Components/Profile/ArtistContent";
+import ArtistSidebar from "@/custom/components/Profile/ArtistSidebar";
+import ArtistContent from "@/custom/components/Profile/ArtistContent";
 import { GetArtworksWS } from "@/custom/interfaces/Profile/Profile";
 import { Artwork } from "@/custom/interfaces/Profile/ArtistContent";
 import { UserSocialMedia } from "@/custom/interfaces/ProfileSettings/ProfileSocialMedia";

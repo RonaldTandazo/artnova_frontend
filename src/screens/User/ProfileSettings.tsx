@@ -5,17 +5,17 @@ import { useEffect, useState } from "react";
 import { ImProfile } from "react-icons/im";
 import { RiLockPasswordFill } from "react-icons/ri";
 import { PiShareNetworkFill } from "react-icons/pi";
-import NotificationAlert from "@/custom/Components/States/NotificationAlert";
+import NotificationAlert from "@/custom/components/States/NotificationAlert";
 import { useGetCountry } from "@/services/Country/CountryService";
 import { useGetSocialMedia } from "@/services/SocialMedia/SocialMediaService";
 import { GrNodes } from "react-icons/gr";
 import { useGetSkillsData } from "@/services/UserSkills/UserSkillService";
 import { Notification, SelectOptions } from "@/custom/interfaces/General/GeneralInterfaces";
-import ProfileInformation from "@/custom/Components/ProfileSettings/ProfileInformation";
-import SkillsInterests from "@/custom/Components/ProfileSettings/ProfileSkillsInterests";
-import ProfilePicture from "@/custom/Components/ProfileSettings/ProfilePIcture";
-import ProfileSocialMedia from "@/custom/Components/ProfileSettings/ProfileSocialMedia";
-import ProfileChangePassword from "@/custom/Components/ProfileSettings/ProfileChangePassword";
+import ProfileInformation from "@/custom/components/ProfileSettings/ProfileInformation";
+import SkillsInterests from "@/custom/components/ProfileSettings/ProfileSkillsInterests";
+import ProfilePicture from "@/custom/components/ProfileSettings/ProfilePIcture";
+import ProfileSocialMedia from "@/custom/components/ProfileSettings/ProfileSocialMedia";
+import ProfileChangePassword from "@/custom/components/ProfileSettings/ProfileChangePassword";
 
 const ProfileSettings = () => {
     const { colorMode } = useColorMode();

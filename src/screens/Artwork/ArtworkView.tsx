@@ -1,18 +1,18 @@
 import { useColorMode } from '@/components/ui/color-mode';
 import { useAuth } from '@/context/AuthContext';
-import CarouselViewer from '@/custom/Components/Artwork/ArtworkView/CarouselViewer';
-import LoadingProgress from '@/custom/Components/States/LoadingProgress';
-import Empty from '@/custom/Components/States/Empty';
+import CarouselViewer from '@/custom/components/Artwork/ArtworkView/CarouselViewer';
+import LoadingProgress from '@/custom/components/States/LoadingProgress';
+import Empty from '@/custom/components/States/Empty';
 import { useGetArtworkDetails } from '@/services/Artwork/ArtworkService';
 import { useDeleteArtworkComment, useGetArtworkStatistics, usePostArtworkComment, useStoreArtworkViews, useUpdateArtworkDisLikes, useUpdateArtworkFavorites, useUpdateArtworkLikes, useUpdateCommentDisLikes, useUpdateCommentLikes } from '@/services/ArtworkStatistics/ArtworkStatisticsService';
 import { decodeFromBase64, encodeToBase64 } from '@/utils/Helpers';
 import { Box, Grid, GridItem, Show, Stack } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import InformationPanel from '@/custom/Components/Artwork/ArtworkView/InformationPanel';
+import InformationPanel from '@/custom/components/Artwork/ArtworkView/InformationPanel';
 import { ArtworkComment, ArtworkInformation, ArtworkStats } from '@/custom/interfaces/ArtworkView/ArtworkView';
 import { OnDislikeData, OnFavoritesData, OnLikeData } from '@/custom/interfaces/ArtworkView/InformationPanel';
-import ArtworkComments from '@/custom/Components/Artwork/ArtworkView/ArtworkComments';
+import ArtworkComments from '@/custom/components/Artwork/ArtworkView/ArtworkComments';
 
 const ArtworkView = () => {
     const { user } = useAuth();

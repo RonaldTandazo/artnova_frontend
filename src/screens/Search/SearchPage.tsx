@@ -1,7 +1,7 @@
 import { useColorMode } from "@/components/ui/color-mode";
-import ArtVerseGrid from "@/custom/Components/ArtVerse/ArtVerseGrid";
-import Empty from "@/custom/Components/States/Empty";
-import LoadingProgress from "@/custom/Components/States/LoadingProgress";
+import ArtVerseGrid from "@/custom/components/ArtVerse/ArtVerseGrid";
+import Empty from "@/custom/components/States/Empty";
+import LoadingProgress from "@/custom/components/States/LoadingProgress";
 import { Results } from "@/custom/interfaces/Search/SearchPage";
 import { useGetSearchResults } from "@/services/Search/SearchService";
 import { Box, Button, For, Heading, HStack, Show, Text } from "@chakra-ui/react";
@@ -9,7 +9,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { FaFilter } from "react-icons/fa";
 import { useSearchParams } from "react-router-dom";
 import FiltersDrawer from "./FiltersDrawer";
-import ArtistCard from "@/custom/Components/Artist/ArtistCard";
+import ArtistCard from "@/custom/components/Artist/ArtistCard";
 
 const SearchPage = () => {
     const { colorMode } = useColorMode();

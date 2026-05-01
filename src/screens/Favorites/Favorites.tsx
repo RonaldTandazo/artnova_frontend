@@ -1,6 +1,6 @@
-import ArtVerseGrid from "@/custom/Components/ArtVerse/ArtVerseGrid";
-import Empty from "@/custom/Components/States/Empty";
-import LoadingProgress from "@/custom/Components/States/LoadingProgress";
+import ArtVerseGrid from "@/custom/components/ArtVerse/ArtVerseGrid";
+import Empty from "@/custom/components/States/Empty";
+import LoadingProgress from "@/custom/components/States/LoadingProgress";
 import { ArtVerseArtWork } from "@/custom/interfaces/ArtVerse/ArtVerse";
 import { useGetUserFavoritesArtworks } from "@/services/Favorites/FavoritesService";
 import { Box, Heading, Show } from "@chakra-ui/react";

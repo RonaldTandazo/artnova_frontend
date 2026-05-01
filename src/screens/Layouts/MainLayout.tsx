@@ -1,9 +1,9 @@
 import { Box, Show } from "@chakra-ui/react";
 import { useColorMode } from "@/components/ui/color-mode";
 import { Outlet, useLocation } from "react-router-dom";
-import ThemeButton from "@/custom/Components/FloatingButtons/ThemeButton";
-import NavBar from "@/custom/Components/NavBar/NavBar";
-import ArtVerseButton from "@/custom/Components/FloatingButtons/ArtVerseButton";
+import ThemeButton from "@/custom/components/FloatingButtons/ThemeButton";
+import NavBar from "@/custom/components/NavBar/NavBar";
+import ArtVerseButton from "@/custom/components/FloatingButtons/ArtVerseButton";
 
 const MainLayout = () => {
     const { colorMode } = useColorMode();

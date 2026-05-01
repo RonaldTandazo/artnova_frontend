@@ -4,7 +4,7 @@ import { OBJLoader/*, MTLLoader*/ } from "three-stdlib";
 import { Box, Button, FileUpload, Heading, Icon, Show } from "@chakra-ui/react";
 import { LuUpload } from "react-icons/lu";
 import { OrbitControls } from '@react-three/drei';
-import LoadingProgress from "@/custom/Components/States/LoadingProgress";
+import LoadingProgress from "@/custom/components/States/LoadingProgress";
 
 function ModeloOBJ({ objUrl/*, mtlUrl, setLoading*/ }: any) {
     const obj = useLoader(OBJLoader, objUrl);

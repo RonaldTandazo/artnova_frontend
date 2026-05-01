@@ -1,7 +1,7 @@
 import { useColorMode } from "@/components/ui/color-mode";
 import { useAuth } from "@/context/AuthContext";
-import LoadingProgress from "@/custom/Components/States/LoadingProgress";
-import SearchableSelect from "@/custom/Components/Searchable/SearchableSelect";
+import LoadingProgress from "@/custom/components/States/LoadingProgress";
+import SearchableSelect from "@/custom/components/Searchable/SearchableSelect";
 import { Box, Breadcrumb, Button, Card, Checkbox, CheckboxCard, Field, FileUpload, Flex, For, Grid, GridItem, Heading, Icon, IconButton, Image, Input, Show, Spacer, Spinner, Stack, Tabs, Text, Textarea } from "@chakra-ui/react";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -12,18 +12,24 @@ import 'react-image-crop/dist/ReactCrop.css'
 import { GrPowerReset } from "react-icons/gr";
 import { FaCropSimple, FaNewspaper } from "react-icons/fa6";
 import { Md3dRotation, MdSlowMotionVideo } from "react-icons/md";
-import NotificationAlert from "@/custom/Components/States/NotificationAlert";
-import SearchableInput from "@/custom/Components/Searchable/SearchableInput";
+import NotificationAlert from "@/custom/components/States/NotificationAlert";
+import SearchableInput from "@/custom/components/Searchable/SearchableInput";
 import { useGetArtworkFormData, useStoreArtwork } from "@/services/Artwork/ArtworkService";
 import { IoMdImages } from "react-icons/io";
-import MultimediaCollector from "@/custom/Components/Artwork/MultimediaCollector";
+import MultimediaCollector from "@/custom/components/Artwork/MultimediaCollector";
 import { RiCalendarScheduleFill } from "react-icons/ri";
-import MultimediaDialog from "@/custom/Components/Dialogs/MultimediaDialog";
+import MultimediaDialog from "@/custom/components/Dialogs/MultimediaDialog";
 import { convertBase64ToFile, encodeToBase64 } from "@/utils/Helpers";
 import { SelectOptions } from "@/custom/interfaces/General/GeneralInterfaces";
-import { ArtWorkForm, FileInterface, MultimediaFiles } from "@/custom/interfaces/NewArtwork/NewArtwork";
-import ScheduleDrawer from "@/custom/Components/Artwork/NewArtwork/ScheduleDrawer";
+import { ArtWorkForm, MultimediaFiles } from "@/custom/interfaces/NewArtwork/NewArtwork";
+import ScheduleDrawer from "@/custom/components/Artwork/NewArtwork/ScheduleDrawer";
 import { DateValue, getLocalTimeZone, Time } from "@internationalized/date";
+import Upload3DFile from "@/custom/components/Artwork/Upload3DFile";
+import { FileInterface } from "@/custom/interfaces/Collector/MultimediaCollector";
+import ModelViewer from "@/custom/components/Artwork/ModelViewer";
+import { ModelFileInterface } from "@/custom/interfaces/3DFile/Upload3DFile";
+import { useLoader } from "@react-three/fiber";
+import { GLTFLoader } from "three-stdlib";
 
 const NewArtwork = () => {
     const { storeArtwork: StoreArtwork, data: storeArtworkData, loading: storeArtworkLoading, error: storeArtworkError } = useStoreArtwork();
@@ -54,6 +60,7 @@ const NewArtwork = () => {
     const [error, setError] = useState<string | undefined>(undefined);
     const [activeTab, setActiveTab] = useState<string | null>("1");
     const [multimedia, setMultimedia] = useState<MultimediaFiles[]>([]);
+    const [modelFile, setModelFile] = useState<ModelFileInterface | undefined>(undefined);
     const [openDrawer, setOpenDrawer] = useState<boolean>(false)
 
     const {
@@ -295,7 +302,7 @@ const NewArtwork = () => {
         setActiveTab(e.value);
     };
 
-    const handleMultimediaUpdate = (type: string, files: []) => {
+    const handleMultimediaUpdate = (type: string, files: FileInterface[]) => {
         const existType = multimedia?.find((item) => item.type == type)
         if(existType){
             const updatedMultimedia = multimedia?.map((item) =>
@@ -310,6 +317,38 @@ const NewArtwork = () => {
             setMultimedia([...multimedia, newType])
         }
     }
+
+    const handle3DModelUpdate = (file: ModelFileInterface) => {
+        setModelFile(file)
+    }
+
+    const handleRemoveModel = () => {
+        if (modelFile?.allURLs) {
+            modelFile.allURLs.forEach((url: string) => URL.revokeObjectURL(url));
+        }
+        setModelFile(undefined);
+    };
+
+    const handleAddTexturesToModel = (newTextureFiles: File[]) => {
+        if (!modelFile) return;
+
+        useLoader.clear(GLTFLoader, modelFile.display as string);
+
+        const newObjectURLs = [...(modelFile.allURLs || [])];
+        const updatedAssetMap = new Map(modelFile.assetMap || []);
+
+        newTextureFiles.forEach(file => {
+            const url = URL.createObjectURL(file);
+            newObjectURLs.push(url);
+            updatedAssetMap.set(file.name, url);
+        });
+
+        setModelFile({
+            ...modelFile,
+            assetMap: updatedAssetMap,
+            allURLs: newObjectURLs
+        });
+    };
 
     const handleError = (errorMessage: string | undefined) => {
         setError(errorMessage)
@@ -349,10 +388,25 @@ const NewArtwork = () => {
         },
         {
             index: "3",
-            title: "3D Viewer",
+            title: "3D Model",
             icon: <Md3dRotation />,
             content: (
-                <>3D</>
+                <Show
+                    when={modelFile == undefined}
+                    fallback={
+                        <ModelViewer
+                            key={modelFile?.allURLs?.length || 0}
+                            fileObject={modelFile!}
+                            onRemove={handleRemoveModel} 
+                            onAddTextures={handleAddTexturesToModel}
+                        />
+                    }
+                >
+                    <Upload3DFile
+                        onUpdate={handle3DModelUpdate}
+                        onError={handleError}
+                    />
+                </Show>
             )
         }
     ];

@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BsPersonFillAdd } from "react-icons/bs";
 import { useColorMode } from "@/components/ui/color-mode";
-import NotificationAlert from "@/custom/Components/States/NotificationAlert";
+import NotificationAlert from "@/custom/components/States/NotificationAlert";
 
 interface FormValues {
     firstName: string;

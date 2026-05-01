@@ -2,19 +2,18 @@ import { useColorMode } from '@/components/ui/color-mode';
 import { Tooltip } from '@/components/ui/tooltip';
 import { Box, FileUpload, Flex, For, Grid, GridItem, Icon, Image, Show } from '@chakra-ui/react';
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
-import { FaTrash } from 'react-icons/fa';
 import { FaCropSimple } from 'react-icons/fa6';
-import { LuUpload } from 'react-icons/lu';
+import { LuTrash2, LuUpload } from 'react-icons/lu';
 import MultimediaDialog from '../Dialogs/MultimediaDialog';
 import { convertBase64ToFile } from '@/utils/Helpers';
+import { FileInterface, MultimediaCollectorProps } from '@/custom/interfaces/Collector/MultimediaCollector';
 
-type FileInterface = {
-    originalFile: File | string;
-    crop: File | undefined;
-    display: string;
-};
-
-const MultimediaCollector = ({ type, onUpdate, files, onError }: any) => {
+const MultimediaCollector = ({ 
+    type,
+    onUpdate,
+    files,
+    onError
+}: MultimediaCollectorProps) => {
     const [fileURL, setFileURL] = useState<string | undefined>(undefined)
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const { colorMode } = useColorMode();
@@ -124,17 +123,22 @@ const MultimediaCollector = ({ type, onUpdate, files, onError }: any) => {
 
     const handleRemoveFile = (indexToRemove: number) => {
         const fileToRemove = files[indexToRemove];
-        const newFiles = files.filter((_: FileInterface, index: number) => index !== indexToRemove);
+        const newFiles = files.filter((_, index) => index !== indexToRemove);
         onUpdate(type, newFiles);
 
-        if (type === 'videos' && fileToRemove.originalFile.startsWith('blob:')) {
+        if (
+            type === 'videos' && 
+            fileToRemove?.originalFile && 
+            typeof fileToRemove.originalFile === 'string' && 
+            fileToRemove.originalFile.startsWith('blob:')
+        ) {
             URL.revokeObjectURL(fileToRemove.originalFile);
         }
     }
 
     const handleCrop = (index: number) => {
         const fileToRecrop = files[index];
-        setFileURL(fileToRecrop.originalFile);
+        if(typeof fileToRecrop.originalFile === 'string') setFileURL(fileToRecrop.originalFile);
         setIsModalOpen(true);
         setRecropIndex(index);
     }
@@ -271,7 +275,7 @@ const MultimediaCollector = ({ type, onUpdate, files, onError }: any) => {
                                         justifyContent={"space-around"}
                                     >
                                         <Icon
-                                            as={FaTrash}
+                                            as={LuTrash2}
                                             cursor="pointer"
                                             size={"md"}
                                             color={"tomato"}

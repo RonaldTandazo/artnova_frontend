@@ -2,8 +2,8 @@ import { useColorMode } from "@/components/ui/color-mode";
 import { useAuth } from "@/context/AuthContext";
 import { ChatItemInterface } from "@/graphql/Chat/ChatInterfaces";
 import { useState } from "react";
-import ChatSidebar from "@/custom/Components/Chat/ChatSidebar";
-import ChatWindow from "@/custom/Components/Chat/ChatWindow";
+import ChatSidebar from "@/custom/components/Chat/ChatSidebar";
+import ChatWindow from "@/custom/components/Chat/ChatWindow";
 import { Flex } from "@chakra-ui/react";
 
 const Chat = () => {

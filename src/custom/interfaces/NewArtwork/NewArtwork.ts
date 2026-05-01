@@ -1,3 +1,4 @@
+import { FileInterface } from "../Collector/MultimediaCollector";
 import { Publishing } from "../General/GeneralInterfaces"
 import { Category, Software, Topic } from "../ProfileSettings/ProfileSkillsInterests"
 
@@ -14,12 +15,6 @@ export interface MultimediaFiles {
     type: string;
     files: FileInterface[];
 }
-
-export interface FileInterface {
-    originalFile: File | string | undefined;
-    crop: File | undefined;
-    display: string | undefined;
-};
 
 export interface ArtWorkForm {
     status: number;

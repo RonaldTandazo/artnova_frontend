@@ -8,7 +8,7 @@ import './index.css'
 import AppRoutes from './routes/AppRoutes';
 import { ApolloProvider } from "@apollo/client/react";
 import { client } from "./utils/ApolloClient.ts";
-import AuthLoader from "./custom/Components/Loaders/AuthLoader.tsx";
+import AuthLoader from "./custom/components/Loaders/AuthLoader.tsx";
 
 createRoot(document.getElementById('root')!).render(
   // <StrictMode>
