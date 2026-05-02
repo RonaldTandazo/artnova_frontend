@@ -131,7 +131,9 @@ const InformationPanel = ({
                             display={"flex"}
                             alignItems={"center"}
                             justifyContent={"center"}
-                            bg={colorMode === 'light' ? 'teal.400' : 'pink.600'}
+                            bgGradient={"to-br"}
+                            gradientFrom={colorMode === 'light' ? "purple.500":"pink.700"} 
+                            gradientTo={colorMode === 'light' ? "teal.400":"cyan.900"}
                             color={'whiteAlpha.950'}
                         >
                             <Icon

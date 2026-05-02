@@ -20,7 +20,7 @@ const ProfileSocialMedia = ({socialMedia, socialMediaLoading, resetAlert, handle
     const { removeUserNetwork: RemoveUserNetwork, error: removeUserNetworkError } = useRemoveUserSocialNetowrk();
 
     useEffect(() => {
-        getUserSocialMedia({userId: null, module: null});
+        getUserSocialMedia({value: null, module: 'ProfileSettings'});
     }, []);
 
     useEffect(() => {

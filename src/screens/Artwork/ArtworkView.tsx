@@ -208,9 +208,7 @@ const ArtworkView = () => {
                 return comment;
             });
     
-            if(commentChange){
-                setComments(updatedComments)
-            }
+            if(commentChange) setComments(updatedComments)
         }else{
             checkAuthentication()
         }
