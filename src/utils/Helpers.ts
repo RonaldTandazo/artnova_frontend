@@ -95,12 +95,17 @@ export const generateTimeSlots = (
     return slots;
 };
 
-
 export const formatTime = (time: Time) => `${String(time.hour).padStart(2, "0")}:${String(time.minute).padStart(2, "0")}`
 
 export const formatWeekday = (date: Date) => date.toLocaleDateString("en-US", { weekday: "long" })
 
 export const formatMonthDay = (date: Date) => date.toLocaleDateString("en-US", { month: "long", day: "numeric" })
+
+export const MAX_MODEL_SIZE_BYTES = 50 * 1024 * 1024 * 1024;
+
+export const VALID_MODEL_EXTENSIONS = ['gltf', 'glb', 'bin', 'jpg', 'jpeg', 'png', 'webp'];
+
+export const ALLOWED_MODEL_TEXTURES = ['jpg', 'jpeg', 'png', 'webp'];
 
 export const FACTORY_SETTINGS: SceneConfig = {
     intensity: [1],
@@ -127,3 +132,14 @@ export const settingsOptions = [
     { id: 'freeze', label: 'Freeze Mouse (Orbit)', component: 'freeze' },
     { id: 'bg-color', label: 'Background Color', component: 'color' },
 ];
+
+export const helpText: Record<string, string> = {
+    "Light Direction": "Adjusts the main light's position in 3D space across the X, Y, and Z axes",
+    "Lighting Intensity": "Controls the brightness of the light. High values may cause 'overexposure' on the model",
+    "Exposure": "Adjusts the camera's light sensitivity, affecting the overall brightness of the scene",
+    "Contact Shadows": "Generates detailed shadows where the model meets the ground for enhanced realism",
+    "Auto Rotate": "Enables the model to automatically rotate around its own axis",
+    "Fixed Framing (Stage)": "Keeps the model centered and automatically scales it to fit the screen",
+    "Freeze Mouse (Orbit)": "Disables the ability to rotate or move the model using the mouse",
+    "Background": "Changes the background color of the 3D viewer"
+};

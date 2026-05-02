@@ -2,13 +2,13 @@ import { CombinedGraphQLErrors } from '@apollo/client';
 import { useMutation, useLazyQuery } from '@apollo/client/react';
 import { GET_USER_SOCIAL_MEDIA } from '@/graphql/UserSocialNetwork/UserSocialNetworkQueries';
 import { REMOVE_USER_NETWORK, STORE_USER_NETWORK, UPDATE_USER_NETWORK } from '@/graphql/UserSocialNetwork/UserSocialNetworkMutations';
-import { UserVariablesInterface } from '@/graphql/User/UserInterfaces';
 import { GetUserSocialMedia } from '@/custom/interfaces/ProfileSettings/ProfileSocialMedia';
+import { ValidateAccessInput } from '@/graphql/Authentication/AuthenticationInterfaces';
 
 export const useGetUserSocialMedia = () => {
     const [execute, { data, loading, error }] = useLazyQuery<GetUserSocialMedia>(GET_USER_SOCIAL_MEDIA);
 
-    const GetUserSocialMedia = async (data: UserVariablesInterface) => {
+    const GetUserSocialMedia = async (data: ValidateAccessInput) => {
         return execute({
             variables: { data }
         });

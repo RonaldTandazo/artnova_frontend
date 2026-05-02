@@ -10,7 +10,16 @@ import { MdHideImage, MdTopic } from "react-icons/md";
 import { FaBookmark, FaMicrochip, FaRegBookmark } from "react-icons/fa6";
 import { InformationPanelProps, OnDislikeData, OnFavoritesData, OnLikeData } from "@/custom/interfaces/ArtworkView/InformationPanel";
 
-const InformationPanel = ({user, artworkData, artworkStatistics, onLike, onDisLike, onFavorites, toProfile, checkAuthentication}: InformationPanelProps) => {
+const InformationPanel = ({
+    user,
+    artworkData,
+    artworkStatistics,
+    onLike,
+    onDisLike,
+    onFavorites,
+    toProfile,
+    checkAuthentication
+}: InformationPanelProps) => {
     const { colorMode } = useColorMode();
 
     const handleLikes = () => {

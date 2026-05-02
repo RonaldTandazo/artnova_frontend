@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
 export const GET_USER_DATA = gql`
-    query GetUserGeneralData($userId: Int!) {
-        getUserGeneralData(userId: $userId) {
+    query GetUserGeneralData($data: ValidateAccessInput!) {
+        getUserGeneralData(data: $data) {
             userId
             firstName
             lastName
@@ -20,8 +20,8 @@ export const GET_USER_DATA = gql`
 `;
 
 export const GET_USER_STATS_DATA = gql`
-    query GetUserStats($userId: Int) {
-        getUserStats(userId: $userId) {
+    query GetUserStats($data: ValidateAccessInput!) {
+        getUserStats(data: $data) {
             followersCount
             followingCount
         }

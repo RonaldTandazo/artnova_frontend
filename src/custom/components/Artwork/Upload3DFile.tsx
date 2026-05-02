@@ -1,10 +1,8 @@
 import { Upload3DFileProps } from '@/custom/interfaces/3DFile/Upload3DFile';
+import { MAX_MODEL_SIZE_BYTES, VALID_MODEL_EXTENSIONS } from '@/utils/Helpers';
 import { Badge, Box, FileUpload, Flex, HStack, Icon } from '@chakra-ui/react';
 import { ChangeEvent, useState } from 'react'
 import { LuUpload } from 'react-icons/lu';
-
-const MAX_SIZE_BYTES = 50 * 1024 * 1024 * 1024;
-const VALID_EXTENSIONS = ['gltf', 'glb', 'bin', 'jpg', 'jpeg', 'png', 'webp'];
 
 const Upload3DFile = ({
     onUpdate,
@@ -24,8 +22,8 @@ const Upload3DFile = ({
 
         const validFiles = rawFiles.filter(file => {
             const extension = file.name.split('.').pop()?.toLowerCase() || '';
-            const isValidExt = VALID_EXTENSIONS.includes(extension);
-            const isValidSize = file.size <= MAX_SIZE_BYTES;
+            const isValidExt = VALID_MODEL_EXTENSIONS.includes(extension);
+            const isValidSize = file.size <= MAX_MODEL_SIZE_BYTES;
 
             if (!isValidExt) console.warn(`File skipped (invalid type): ${file.name}`);
             if (!isValidSize) onError(`File ${file.name} is too large (Max 50GB).`);
@@ -69,6 +67,7 @@ const Upload3DFile = ({
             display: fileMap.get(mainFile.name),
             assetMap: fileMap,
             allURLs: objectURLs,
+            allFiles: validFiles,
             type: mainFile.name.endsWith('.glb') ? 'glb' : 'gltf'
         });
     };

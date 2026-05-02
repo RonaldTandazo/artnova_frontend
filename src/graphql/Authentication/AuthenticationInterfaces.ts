@@ -7,7 +7,7 @@ export interface LoginInterface {
 }
 
 export interface ValidateAccessInput {
-    value: number
+    value: number | null
     module: string
 }
 

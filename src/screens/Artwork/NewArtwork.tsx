@@ -19,7 +19,7 @@ import { IoMdImages } from "react-icons/io";
 import MultimediaCollector from "@/custom/components/Artwork/MultimediaCollector";
 import { RiCalendarScheduleFill } from "react-icons/ri";
 import MultimediaDialog from "@/custom/components/Dialogs/MultimediaDialog";
-import { convertBase64ToFile, encodeToBase64 } from "@/utils/Helpers";
+import { ALLOWED_MODEL_TEXTURES, convertBase64ToFile, encodeToBase64, FACTORY_SETTINGS, MAX_MODEL_SIZE_BYTES } from "@/utils/Helpers";
 import { SelectOptions } from "@/custom/interfaces/General/GeneralInterfaces";
 import { ArtWorkForm, MultimediaFiles } from "@/custom/interfaces/NewArtwork/NewArtwork";
 import ScheduleDrawer from "@/custom/components/Artwork/NewArtwork/ScheduleDrawer";
@@ -27,7 +27,7 @@ import { DateValue, getLocalTimeZone, Time } from "@internationalized/date";
 import Upload3DFile from "@/custom/components/Artwork/Upload3DFile";
 import { FileInterface } from "@/custom/interfaces/Collector/MultimediaCollector";
 import ModelViewer from "@/custom/components/Artwork/ModelViewer";
-import { ModelFileInterface } from "@/custom/interfaces/3DFile/Upload3DFile";
+import { ModelFileInterface, SceneConfig } from "@/custom/interfaces/3DFile/Upload3DFile";
 import { useLoader } from "@react-three/fiber";
 import { GLTFLoader } from "three-stdlib";
 
@@ -61,7 +61,8 @@ const NewArtwork = () => {
     const [activeTab, setActiveTab] = useState<string | null>("1");
     const [multimedia, setMultimedia] = useState<MultimediaFiles[]>([]);
     const [modelFile, setModelFile] = useState<ModelFileInterface | undefined>(undefined);
-    const [openDrawer, setOpenDrawer] = useState<boolean>(false)
+    const [openDrawer, setOpenDrawer] = useState<boolean>(false);
+    const [config, setConfig] = useState<SceneConfig>(FACTORY_SETTINGS);
 
     const {
         handleSubmit,
@@ -246,8 +247,10 @@ const NewArtwork = () => {
 
         const images = multimediaMap['images']?.map((file: FileInterface) => file.crop) ?? [];
         const videos = multimediaMap['videos']?.map((file: FileInterface) => file.originalFile) ?? [];
-        const file3d = multimediaMap['3d'] ?? '';
-
+        const modelMainFile = modelFile?.originalFile ?? null;
+        const modelResources = (modelFile?.allFiles ?? []).filter((file) => file.name !== modelMainFile?.name);
+        const modelSettings = modelFile ? config : null;
+        
         const formData = {
             title: title.trim(),
             description: description ? description.trim():description,
@@ -257,7 +260,9 @@ const NewArtwork = () => {
             softwares: softwareIds,
             images: images,
             videos: videos,
-            file3d: file3d,
+            modelMainFile: modelMainFile, 
+            modelResources: modelResources,
+            modelSettings: modelSettings,
             thumbnail: preview?.crop,
             publishing: status,
             schedule: isSchedule,
@@ -329,15 +334,29 @@ const NewArtwork = () => {
         setModelFile(undefined);
     };
 
-    const handleAddTexturesToModel = (newTextureFiles: File[]) => {
+    const handleAddTexturesToModel = (newFiles: File[]) => {
         if (!modelFile) return;
+
+        const validTextures = newFiles.filter(file => {
+            const extension = file.name.split('.').pop()?.toLowerCase() || '';
+            const isValidExt = ALLOWED_MODEL_TEXTURES.includes(extension);
+            const isValidSize = file.size <= MAX_MODEL_SIZE_BYTES;
+
+            if (!isValidExt) handleError(`The file "${file.name}" is not a valid image (JPG, PNG, WebP)`);
+            if (!isValidSize) handleError(`The texture "${file.name}" exceeds the size limit`);
+
+            return isValidExt && isValidSize;
+        });
+
+        if (validTextures.length === 0) return;
 
         useLoader.clear(GLTFLoader, modelFile.display as string);
 
         const newObjectURLs = [...(modelFile.allURLs || [])];
         const updatedAssetMap = new Map(modelFile.assetMap || []);
+        const updatedAllFiles = [...(modelFile.allFiles || []), ...validTextures];
 
-        newTextureFiles.forEach(file => {
+        validTextures.forEach(file => {
             const url = URL.createObjectURL(file);
             newObjectURLs.push(url);
             updatedAssetMap.set(file.name, url);
@@ -346,7 +365,8 @@ const NewArtwork = () => {
         setModelFile({
             ...modelFile,
             assetMap: updatedAssetMap,
-            allURLs: newObjectURLs
+            allURLs: newObjectURLs,
+            allFiles: updatedAllFiles
         });
     };
 
@@ -397,6 +417,8 @@ const NewArtwork = () => {
                         <ModelViewer
                             key={modelFile?.allURLs?.length || 0}
                             fileObject={modelFile!}
+                            config={config}
+                            setConfig={setConfig}
                             onRemove={handleRemoveModel} 
                             onAddTextures={handleAddTexturesToModel}
                         />

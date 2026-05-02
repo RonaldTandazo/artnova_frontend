@@ -26,7 +26,7 @@ export const GET_ARTVERSE_ARTWORKS = gql`
 `;
 
 export const GET_USER_ARTWORKS = gql`    
-    query GetUserArtworks($data: UserVariablesInput!){ 
+    query GetUserArtworks($data: ValidateAccessInput!){ 
         getUserArtworks(data: $data){
             artworkId
             title

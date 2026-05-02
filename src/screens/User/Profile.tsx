@@ -61,6 +61,8 @@ const Profile = () => {
         if(value && module){
             const userId = parseInt(decodeFromBase64(value));
             const moduleDecoded = decodeFromBase64(module);
+        
+            if (!user && moduleDecoded === 'OwnProfile') handleRedirect(userId);
             
             setLoading(true);
             setArtworks([]);
@@ -70,13 +72,13 @@ const Profile = () => {
             setOpenMenuId(undefined);
             
             const searchData = {
-                userId: userId,
+                value: moduleDecoded != 'OwnProfile' ? userId : null,
                 module: moduleDecoded
             }
             
             if(moduleDecoded != 'OwnProfile') {
-                getUserGeneralData(userId)
-                getFollowState({followedId: userId})
+                getUserGeneralData(searchData)
+                if(user) getFollowState({followedId: userId})
             } else {
                 if(user){    
                     setUserData({
@@ -84,9 +86,9 @@ const Profile = () => {
                         chatId: undefined
                     });
                 }
-            }
+            }    
             
-            getUserStats(moduleDecoded != 'OwnProfile' ? userId : undefined)
+            getUserStats(searchData)
             getUserArtworks(searchData)
             getUserSocialMedia(searchData);
         }
@@ -162,9 +164,7 @@ const Profile = () => {
         }
     }
 
-    const handleMenuOpen = (artworkId: number | undefined) => {
-        setOpenMenuId(artworkId);
-    };
+    const handleMenuOpen = (artworkId: number | undefined) => setOpenMenuId(artworkId);
 
     const handleFollowState = (state: boolean) => {
         if(!isOwnProfile && user && userData){
@@ -191,6 +191,18 @@ const Profile = () => {
             deleteUserArtworks(deleteArtworks)
 
             setArtworks(prev => prev.filter(artwork => !artworkIds.includes(artwork.artworkId)));
+        }
+    }
+
+    const handleRedirect = (userId: number) => {
+        if(userId){
+            const encodedUserId = encodeToBase64(userId);
+            const encodedModule = encodeToBase64('VisitProfile');
+
+            const safeUserId = encodeURIComponent(encodedUserId);
+            const safeModule = encodeURIComponent(encodedModule);
+            
+            navigate(`/Profile/${safeUserId}/${safeModule}`);
         }
     }
 

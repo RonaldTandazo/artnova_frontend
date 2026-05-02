@@ -82,7 +82,7 @@ const ArtworkComments = ({
                                     when={!user}
                                 >
                                     <Text fontWeight={"bold"} fontSize={"xs"}>
-                                        You must log in to Post or Reply to a Comment
+                                        **You must log in to Post or Reply to a Comment
                                     </Text>
                                 </Show>
 

@@ -2,11 +2,11 @@ import { CombinedGraphQLErrors } from '@apollo/client/errors';
 import { useMutation, useLazyQuery } from "@apollo/client/react";
 import { DELETE_USER_ARTWORKS, STORE_ARTWORK } from '@/graphql/Artwork/ArtworkMutations';
 import { GET_ARTVERSE_ARTWORKS, GET_USER_ARTWORKS, GET_ARTWORK_DETAILS, GET_ARTWORK_FORM_DATA } from '@/graphql/Artwork/ArtworkQueries';
-import { UserVariablesInterface } from '@/graphql/User/UserInterfaces';
 import { GetUserArtworks } from '@/custom/interfaces/Profile/Profile';
 import { GetArtworkInformation } from '@/custom/interfaces/ArtworkView/ArtworkView';
 import { GetArtWorkFormData, StoreArtWork } from '@/custom/interfaces/NewArtwork/NewArtwork';
 import { GetArtVerse } from '@/custom/interfaces/ArtVerse/ArtVerse';
+import { ValidateAccessInput } from '@/graphql/Authentication/AuthenticationInterfaces';
 
 export const useGetArtVerseArtworks = () => {
     const [getArtVerseArtworks, { loading, data, error }] = useLazyQuery<GetArtVerse>(GET_ARTVERSE_ARTWORKS, {
@@ -36,7 +36,7 @@ export const useGetUserArtworks = () => {
         fetchPolicy: 'cache-and-network'
     })
 
-    const GetUserArtworks = async (data: UserVariablesInterface) => {
+    const GetUserArtworks = async (data: ValidateAccessInput) => {
         return execute({
             variables: { data }
         });

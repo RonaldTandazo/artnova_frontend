@@ -54,9 +54,10 @@ const ArtistSidebar = ({
                         bg={colorMode === 'light' ? "whiteAlpha.950" : "blackAlpha.500"}
                         rounded={"lg"}
                         shadow={"lg"}
-                        overflow={"hidden"}
+                        overflowX={"hidden"}
                         maxH={"80vh"}
                         maxW={"20vW"}
+                        overflowY={"auto"}
                     >
                         <Box 
                             h="150px" 
@@ -282,8 +283,8 @@ const ArtistSidebar = ({
                                     <Show
                                         when={!isOwnProfile && !user}
                                     >
-                                        <Text>
-                                            You must log in to Follow or Chat with an Artist
+                                        <Text fontWeight={"bold"} fontSize={"xs"} m={2}>
+                                            **You must log in to Follow or Chat with an Artist
                                         </Text>
                                     </Show>
                                 </Show>
