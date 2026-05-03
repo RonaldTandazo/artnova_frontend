@@ -1,9 +1,9 @@
 import { CombinedGraphQLErrors } from '@apollo/client/errors';
 import { useMutation, useLazyQuery } from "@apollo/client/react";
 import { DELETE_USER_ARTWORKS, STORE_ARTWORK } from '@/graphql/Artwork/ArtworkMutations';
-import { GET_ARTVERSE_ARTWORKS, GET_USER_ARTWORKS, GET_ARTWORK_DETAILS, GET_ARTWORK_FORM_DATA } from '@/graphql/Artwork/ArtworkQueries';
+import { GET_ARTVERSE_ARTWORKS, GET_USER_ARTWORKS, GET_ARTWORK_DETAILS, GET_ARTWORK_FORM_DATA, GET_ARTWORK_MODEL } from '@/graphql/Artwork/ArtworkQueries';
 import { GetUserArtworks } from '@/custom/interfaces/Profile/Profile';
-import { GetArtworkInformation } from '@/custom/interfaces/ArtworkView/ArtworkView';
+import { GetArtworkInformation, GetArtworkModel } from '@/custom/interfaces/ArtworkView/ArtworkView';
 import { GetArtWorkFormData, StoreArtWork } from '@/custom/interfaces/NewArtwork/NewArtwork';
 import { GetArtVerse } from '@/custom/interfaces/ArtVerse/ArtVerse';
 import { ValidateAccessInput } from '@/graphql/Authentication/AuthenticationInterfaces';
@@ -134,6 +134,29 @@ export const useGetArtworkDetails = () => {
 
     return {
         getArtworkDetails: GetArtworkDetails,
+        data,
+        loading,
+        error,
+    };
+};
+
+export const useGetArtworkModel = () => {
+    const [getArtworkModel, { loading, data, error }] = useLazyQuery<GetArtworkModel>(GET_ARTWORK_MODEL)
+    
+    const GetArtworkModel = async (artworkId: number) => {
+        try {
+            await getArtworkModel({ 
+                variables: { artworkId }
+            });
+        } catch (err) {
+            if (err instanceof CombinedGraphQLErrors) {
+                console.error(err.message);
+            }
+        }
+    };
+
+    return {
+        getArtworkModel: GetArtworkModel,
         data,
         loading,
         error,

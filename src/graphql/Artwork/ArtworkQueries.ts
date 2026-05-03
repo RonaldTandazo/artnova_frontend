@@ -98,8 +98,11 @@ export const GET_ARTWORK_DETAILS = gql`
             }
             publishingId
             thumbnail
+            hasImages
             images
+            hasVideos
             videos
+            has3DFile
             owner{
                 ...ArtworkOwner
             }
@@ -108,4 +111,32 @@ export const GET_ARTWORK_DETAILS = gql`
     }
     ${ArtworkOwner}
     ${StandardPayload}
+`;
+
+const ModelSettings = gql`
+    fragment ModelSettings on ModelSettings {
+        environment
+        contactShadow
+        intensity
+        exposure
+        modelColor
+        backgroundColor
+        autoRotate
+        lightPosition
+        lockCameraReset
+        lockInteraction
+    }
+`;
+
+export const GET_ARTWORK_MODEL = gql`    
+    query GetArtworkModel($artworkId: Int!){ 
+        getArtworkModel(artworkId: $artworkId){
+            mainFile
+            resources
+            settings{
+                ...ModelSettings
+            }
+        }
+    }
+    ${ModelSettings}
 `;

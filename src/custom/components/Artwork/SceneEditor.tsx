@@ -17,7 +17,8 @@ const SceneEditor = ({
     config,
     setConfig,
     onSaveAsDefault,
-    onReset
+    onReset,
+    allowSetDefault = true
 }: SceneEditorProps) => {
     const { colorMode } = useColorMode();
     const [isExpanded, setIsExpanded] = useState<boolean>(true);
@@ -264,15 +265,17 @@ const SceneEditor = ({
                 {/* --- FOOTER FIJO --- */}
                 <Box p={4} borderTop="1px solid" borderColor="whiteAlpha.200" bg="black">
                     <HStack gap={2}>
-                        <Button
-                            size="xs"
-                            flex={1}
-                            bg={colorMode === "light" ? "teal.500" : "pink.600"}
-                            color={"white"}
-                            onClick={onSaveAsDefault}
-                        >
-                            <LuAnchor /> Set as Default
-                        </Button>
+                        <Show when={allowSetDefault}>
+                            <Button
+                                size="xs"
+                                flex={1}
+                                bg={colorMode === "light" ? "teal.500" : "pink.600"}
+                                color={"white"}
+                                onClick={onSaveAsDefault}
+                            >
+                                <LuAnchor /> Set as Default
+                            </Button>
+                        </Show>
 
                         <Button
                             size={"xs"}

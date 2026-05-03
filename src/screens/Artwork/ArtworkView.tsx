@@ -13,6 +13,7 @@ import InformationPanel from '@/custom/components/Artwork/ArtworkView/Informatio
 import { ArtworkComment, ArtworkInformation, ArtworkStats } from '@/custom/interfaces/ArtworkView/ArtworkView';
 import { OnDislikeData, OnFavoritesData, OnLikeData } from '@/custom/interfaces/ArtworkView/InformationPanel';
 import ArtworkComments from '@/custom/components/Artwork/ArtworkView/ArtworkComments';
+import ModelViewerLoader from '@/custom/components/Artwork/ArtworkView/ModelViewerLoader';
 
 const ArtworkView = () => {
     const { user } = useAuth();
@@ -264,7 +265,7 @@ const ArtworkView = () => {
                                 bg={colorMode === 'light' ? "whiteAlpha.950" : "blackAlpha.500"}
                             >
                                 <Show
-                                    when={artworkData && (artworkData.images.length > 0 || artworkData.videos.length > 0)}
+                                    when={artworkData && (artworkData.hasImages || artworkData.hasVideos || artworkData.has3DFile)}
                                     fallback={
                                         <Empty
                                             title="No Multimedia Posted Yet"
@@ -272,7 +273,7 @@ const ArtworkView = () => {
                                     }
                                 >
                                     <Show
-                                        when={artworkData?.images && artworkData.images.length > 0}
+                                        when={artworkData?.hasImages}
                                     >
                                         <Box  
                                             p={3}
@@ -286,7 +287,7 @@ const ArtworkView = () => {
                                         </Box>
                                     </Show>
                                     <Show
-                                        when={artworkData?.videos && artworkData.videos.length > 0}
+                                        when={artworkData?.hasVideos}
                                     >
                                         <Box 
                                             p={3}
@@ -299,6 +300,15 @@ const ArtworkView = () => {
                                             <CarouselViewer type="videos" files={artworkData ? artworkData.videos:[]} />
                                         </Box>
                                     </Show>
+                                    <Show
+                                        when={artworkData?.has3DFile}
+                                    >
+                                        <ModelViewerLoader
+                                            artworkId={artworkData?.artworkId}
+                                            thumbnail={artworkData?.thumbnail!}
+                                        />
+                                    </Show>
+
                                 </Show>
                             </Stack>
 

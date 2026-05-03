@@ -3,15 +3,18 @@ import { OrbitControls, Stage } from '@react-three/drei';
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { Box, Button, HStack, Text } from '@chakra-ui/react';
 import * as THREE from 'three';
-import { ModelViewerProps } from '@/custom/interfaces/3DFile/ModelViewer';
+import { LocalModelProps, ModelViewerProps } from '@/custom/interfaces/3DFile/ModelViewer';
 import { LuImagePlus, LuTrash2 } from 'react-icons/lu';
 import { useColorMode } from '@/components/ui/color-mode';
-import { ModelFileInterface, SceneConfig } from '@/custom/interfaces/3DFile/Upload3DFile';
+import { SceneConfig } from '@/custom/interfaces/3DFile/Upload3DFile';
 import { GLTFLoader } from 'three-stdlib';
 import { FACTORY_SETTINGS } from '@/utils/Helpers';
 import SceneEditor from './SceneEditor';
 
-function Model({ fileObject, color }: { fileObject: ModelFileInterface, color: string }) {
+function LocalModel({ 
+    fileObject,
+    color
+}: LocalModelProps) {
     const manager = useMemo(() => {
         const m = new THREE.LoadingManager();
         m.setURLModifier((url) => {
@@ -145,7 +148,7 @@ const ModelViewer = ({
                         shadows={config.contactShadow ? "contact" : false}
                         adjustCamera={!config.lockCameraReset}
                     >
-                        <Model fileObject={fileObject} color={config.modelColor} />
+                        <LocalModel fileObject={fileObject} color={config.modelColor} />
                     </Stage>
                 </Suspense>
                 <OrbitControls

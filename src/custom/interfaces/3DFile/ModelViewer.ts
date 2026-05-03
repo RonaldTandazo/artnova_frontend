@@ -7,3 +7,8 @@ export interface ModelViewerProps {
     onRemove: () => void;
     onAddTextures: (newTextureFiles: File[]) => void;
 }
+
+export interface LocalModelProps {
+    fileObject: ModelFileInterface;
+    color: string;
+}
