@@ -169,7 +169,7 @@ const ArtistContent = ({
             <WarningDialog
                 isOpen={isModalOpen}
                 title={"Delete ArtWork"}
-                message={`Are you sure you want to delete this ArtWorks?`}
+                message={`Are you sure you want to delete those ArtWorks?`}
                 items={selectedItems}
                 onClose={handleCloseDelete}
                 onComplete={handleConfirmDelete}

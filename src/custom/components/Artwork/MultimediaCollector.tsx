@@ -213,7 +213,7 @@ const MultimediaCollector = ({
                         </Box>
                         <Box 
                             p={2} 
-                            bg={colorMode === "light" ? "blackAlpha.300":"blackAlpha.950"}
+                            bg={"blackAlpha.950"}
                         >
                             <Grid
                                 templateColumns="repeat(2, 1fr)"
@@ -247,7 +247,7 @@ const MultimediaCollector = ({
                                                 as={FaCropSimple}
                                                 cursor="pointer"
                                                 size={"md"}
-                                                color={colorMode == 'light' ? "black":"white"}
+                                                color={"white"}
                                                 onClick={() => handleCrop(index)}
                                             />
                                         </GridItem>

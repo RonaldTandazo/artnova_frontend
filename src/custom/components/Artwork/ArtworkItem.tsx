@@ -330,15 +330,6 @@ const ArtworkItem = ({
                     </Grid>
                 </Box>
             </GridItem>
-
-            {/* <WarningDialog
-                isOpen={isModalOpen}
-                title={"Delete ArtWork"}
-                message={`Are you sure you want to delete this ArtWork?`}
-                items={deleteItems}
-                onClose={handleCloseDelete}
-                onComplete={handleConfirmDelete}
-            /> */}
         </>
     );
 };

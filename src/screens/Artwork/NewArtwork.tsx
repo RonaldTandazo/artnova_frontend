@@ -220,9 +220,7 @@ const NewArtwork = () => {
     const handleClose = () => {
         setIsModalOpen(false);
         setFileURL(undefined);
-        if (fileInputRef.current) {
-            fileInputRef.current.value = '';
-        }
+        if (fileInputRef.current) fileInputRef.current.value = '';
     };
 
     const handleCrop = () => {
@@ -267,7 +265,7 @@ const NewArtwork = () => {
             publishing: status,
             schedule: isSchedule,
             publishingTargetStatus: publishingTargetStatus,
-            scheduleAt: data.scheduleAt
+            scheduleAt: isSchedule ? data.scheduleAt : null
         }
 
         return formData;
