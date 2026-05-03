@@ -10,7 +10,7 @@ import { LuChevronDown } from "react-icons/lu";
 import { TiDelete } from "react-icons/ti";
 import { useState } from "react";
 import WarningDialog from "../../Dialogs/WarningDialog";
-import { DeleteItem } from "@/custom/interfaces/Dialogs/WarningDialog";
+import { SelectedItem } from "@/custom/interfaces/Dialogs/WarningDialog";
 import { ArtworkComment } from "@/custom/interfaces/ArtworkView/ArtworkView";
 
 const ArtworkComments = ({
@@ -26,7 +26,7 @@ const ArtworkComments = ({
 }: PostingCommentsProps) => {
     const { colorMode } = useColorMode();
     const [comment, setComment] = useState<string>('');
-    const [deleteItems, setDeleteItems] = useState<DeleteItem[]>([]);
+    const [deleteItems, setDeleteItems] = useState<SelectedItem[]>([]);
     const isPostButtonDisabled = !user || (comment?.trim().length === 0);
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
@@ -40,7 +40,7 @@ const ArtworkComments = ({
         setDeleteItems([])
     };
 
-    const handleConfirmDelete = async (items: DeleteItem[]) => {
+    const handleConfirmDelete = async (items: SelectedItem[]) => {
         handleCloseDelete();
         
         const commentIds = items.map(item => String(item.id))

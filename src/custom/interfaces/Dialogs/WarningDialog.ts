@@ -2,12 +2,12 @@ export interface WarningDialogProps {
     isOpen: boolean;
     title?: string;
     message?: string;
-    items: DeleteItem[];
+    items: SelectedItem[];
     onClose: () => void;
     onComplete: (itemIds: any[]) => void;
 }
 
-export interface DeleteItem {
+export interface SelectedItem {
     id: string | number;
     name: string
 }

@@ -9,7 +9,7 @@ import SearchableSelect from '../Searchable/SearchableSelect';
 import { useColorMode } from '@/components/ui/color-mode';
 import { IoIosSave, IoMdCloseCircle } from 'react-icons/io';
 import { SocialMediaFormValues, SocialMediaItemProps } from '@/custom/interfaces/ProfileSettings/ProfileSocialMedia';
-import { DeleteItem } from '@/custom/interfaces/Dialogs/WarningDialog';
+import { SelectedItem } from '@/custom/interfaces/Dialogs/WarningDialog';
 import WarningDialog from '../Dialogs/WarningDialog';
 
 const SocialMediaListItem = ({ 
@@ -22,7 +22,7 @@ const SocialMediaListItem = ({
     const { colorMode } = useColorMode();
     const [menuOpen, setMenuOpen] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
-    const [deleteItems, setDeleteItems] = useState<DeleteItem[]>([]);
+    const [deleteItems, setDeleteItems] = useState<SelectedItem[]>([]);
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
     const buttonRef = useRef<HTMLButtonElement>(null);
@@ -66,7 +66,7 @@ const SocialMediaListItem = ({
         setDeleteItems([])
     };
     
-    const handleConfirmDelete = async (items: DeleteItem[]) => {
+    const handleConfirmDelete = async (items: SelectedItem[]) => {
         handleCloseDelete();
         
         const userSocialMediaIds = items.map(item => Number(item.id));

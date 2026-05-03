@@ -1,7 +1,7 @@
 import { useColorMode } from "@/components/ui/color-mode";
 import { Tooltip } from "@/components/ui/tooltip";
 import { BACKEND_URL, encodeToBase64, formatSchedule } from "@/utils/Helpers";
-import { Box, Grid, GridItem, Icon, Image, Menu, Portal, Separator, Show, Text } from "@chakra-ui/react";
+import { Box, Checkbox, Grid, GridItem, Icon, Image, Menu, Portal, Separator, Show, Text } from "@chakra-ui/react";
 import { AiFillEdit } from "react-icons/ai";
 import { BiSolidLike } from "react-icons/bi";
 import { BsThreeDotsVertical } from "react-icons/bs";
@@ -11,22 +11,20 @@ import { useNavigate } from "react-router-dom";
 import { MdHideImage } from "react-icons/md";
 import { ArtworkItemProps } from "@/custom/interfaces/Artwork/ArtworkItem";
 import { Artwork } from "@/custom/interfaces/Profile/ArtistContent";
-import { useState } from "react";
-import WarningDialog from "../Dialogs/WarningDialog";
-import { DeleteItem } from "@/custom/interfaces/Dialogs/WarningDialog";
 import { FaComments } from "react-icons/fa6";
 
 const ArtworkItem = ({ 
     artwork, 
     isOpen, 
     onMenuToggle, 
-    isOwnProfile, 
-    onDelete
+    isOwnProfile,
+    isManageMode,
+    onSelectItem,
+    isSelected,
+    setOpenModal
 }: ArtworkItemProps) => {
     const { colorMode }  = useColorMode();
     const navigate = useNavigate();
-    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-    const [deleteItems, setDeleteItems] = useState<DeleteItem[]>([]);
 
     const handleNavigateEditArtwork = (artwork: Artwork) => {
         const encodedArtworkId = encodeToBase64(artwork.artworkId);
@@ -46,27 +44,7 @@ const ArtworkItem = ({
         navigate(`/ArtWorks/View/${safeArtworkId}`);
     }
 
-    const handleCloseMenu = () => {
-        onMenuToggle(isOpen ? undefined : artwork.artworkId);
-    }
-    
-    const toggleWarningDialog = (artwork: Artwork) => {
-        handleCloseMenu();
-        setIsModalOpen(true);
-        setDeleteItems(prev => [...prev, {id: artwork.artworkId, name: artwork.title}])
-    }
-
-    const handleCloseDelete = () => {
-        setIsModalOpen(false);
-        setDeleteItems([])
-    };
-    
-    const handleConfirmDelete = async (items: DeleteItem[]) => {
-        handleCloseDelete();
-        
-        const artworkIds = items.map(item => Number(item.id));
-        onDelete(artworkIds);
-    };
+    const handleCloseMenu = () => onMenuToggle(isOpen ? undefined : artwork.artworkId);
 
     return (
         <>
@@ -79,7 +57,50 @@ const ArtworkItem = ({
                 borderRadius={"sm"}
                 display="flex"
                 flexDirection="column"
+                position="relative"
+                transition="all 0.3s ease"
+                borderWidth="2px"
+                borderColor={isManageMode && isSelected 
+                    ? (colorMode === 'light' ? "teal.500":'pink.500')
+                    : "transparent"
+                }
+                boxShadow={isManageMode && isSelected
+                    ? (colorMode === 'light' 
+                        ? "0 0 30px rgba(45, 170, 150, 0.6)" 
+                        : "0 0 30px rgba(213, 63, 140, 0.6)")
+                    : "none"
+                }
+                _hover={isManageMode ? { transform: "scale(1.02)" } : {}}
             >
+                <Show when={isManageMode}>
+                    <Box
+                        position="absolute"
+                        top={0}
+                        left={0}
+                        right={0}
+                        bottom={0}
+                        zIndex={10}
+                        cursor="pointer"
+                        bg={isSelected ? "blackAlpha.400" : "transparent"}
+                        onClick={() => onSelectItem(artwork)}
+                        display="flex"
+                        alignItems="flex-start"
+                        justifyContent="flex-start"
+                        p={3}
+                    >
+                        <Checkbox.Root
+                            colorPalette={colorMode === 'light' ? "teal":'pink'}
+                            bg={"whiteAlpha.700"}
+                            checked={isSelected}
+                            readOnly
+                            size={"md"}
+                        >
+                            <Checkbox.HiddenInput />
+                            <Checkbox.Control />
+                        </Checkbox.Root>
+                    </Box>
+                </Show>
+
                 <Box
                     w={"full"}
                     h={"full"}
@@ -92,7 +113,7 @@ const ArtworkItem = ({
                     gradientTo={colorMode === 'light' ? "teal.400":"cyan.900"}
                     color={'whiteAlpha.950'}
                     onClick={() => {
-                        if(artwork.publishingId == 1 || artwork.publishingId == 2){
+                        if(!isManageMode && (artwork.publishingId == 1 || artwork.publishingId == 2)){
                             handleNavigateArtworkView(artwork)
                         }
                     }}
@@ -118,7 +139,8 @@ const ArtworkItem = ({
 
                 <Box 
                     p={2} 
-                    bg={colorMode === "light" ? "blackAlpha.300":"blackAlpha.950"}
+                    bg={"blackAlpha.950"}
+                    color={"white"}
                 >
                     <Grid
                         templateColumns="repeat(4, 1fr)"
@@ -243,7 +265,7 @@ const ArtworkItem = ({
                         </Show>
 
                         <Show
-                            when={isOwnProfile}
+                            when={isOwnProfile && !isManageMode}
                         >
                             <GridItem 
                                 colSpan={1}
@@ -286,7 +308,10 @@ const ArtworkItem = ({
                                                     justifyContent={'flex-start'}
                                                     alignItems={'center'}
                                                     cursor={"pointer"}
-                                                    onClick={() => toggleWarningDialog(artwork)}
+                                                    onClick={() => {
+                                                        onSelectItem(artwork)
+                                                        setOpenModal(true);
+                                                    }}
                                                 >
                                                     <Icon size={'sm'}>
                                                         <TiDelete />
@@ -306,14 +331,14 @@ const ArtworkItem = ({
                 </Box>
             </GridItem>
 
-            <WarningDialog
+            {/* <WarningDialog
                 isOpen={isModalOpen}
                 title={"Delete ArtWork"}
                 message={`Are you sure you want to delete this ArtWork?`}
                 items={deleteItems}
                 onClose={handleCloseDelete}
                 onComplete={handleConfirmDelete}
-            />
+            /> */}
         </>
     );
 };

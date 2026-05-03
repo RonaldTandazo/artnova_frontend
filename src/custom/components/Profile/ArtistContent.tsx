@@ -1,9 +1,14 @@
-import { Box, Button, Flex, For, Grid, GridItem, Heading, Show, Spacer, Stack, } from "@chakra-ui/react";
+import { Box, Button, Flex, For, Grid, GridItem, Heading, HStack, Show, Spacer, Stack, } from "@chakra-ui/react";
 import { useColorMode } from "@/components/ui/color-mode";
 import Empty from "../States/Empty";
 import ArtworkItem from "../Artwork/ArtworkItem";
 import { FaPaintBrush } from "react-icons/fa";
-import { ArtistContentProps } from "@/custom/interfaces/Profile/ArtistContent";
+import { ArtistContentProps, Artwork } from "@/custom/interfaces/Profile/ArtistContent";
+import { ImCogs } from "react-icons/im";
+import { useEffect, useState } from "react";
+import { MdCancel } from "react-icons/md";
+import { SelectedItem } from "@/custom/interfaces/Dialogs/WarningDialog";
+import WarningDialog from "../Dialogs/WarningDialog";
 
 const ArtistContent = ({ 
     artworks,
@@ -15,6 +20,39 @@ const ArtistContent = ({
     onDelete 
  }: ArtistContentProps) => {
     const { colorMode } = useColorMode();
+    const [isManageMode, setIsManageMode] = useState<boolean>(false)
+    const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([]);
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
+    useEffect(() => {
+        if(isManageMode && artworks.length == 0) setIsManageMode(false);
+    }, [artworks])
+
+    const handleSelectItem = (artwork: Artwork) => {
+        setSelectedItems(prev => {
+            const exists = prev.some(item => item.id === artwork.artworkId);
+
+            if (exists) {
+                return prev.filter(item => item.id !== artwork.artworkId);
+            } else {
+                return [...prev, { id: artwork.artworkId, name: artwork.title }];
+            }
+        });
+    };
+
+    const isItemSelected = (artwork: Artwork) => selectedItems.some((item) => item.id === artwork.artworkId);
+
+    const handleCloseDelete = () => {
+        setIsModalOpen(false);
+        setSelectedItems([]);
+    };
+        
+    const handleConfirmDelete = async (items: SelectedItem[]) => {
+        handleCloseDelete();
+        
+        const artworkIds = items.map(item => Number(item.id));
+        onDelete(artworkIds);
+    };
     
     return (
         <>
@@ -31,18 +69,60 @@ const ArtistContent = ({
                         <Show
                             when={isOwnProfile}
                         >
+                            <HStack alignItems={"center"} gap={1}>
+                                <Button
+                                    size="sm"
+                                    bg={colorMode === "light" ? "teal.400" : "pink.600"}
+                                    color={"white"}
+                                    shadow={"md"}
+                                    onClick={() => {
+                                        setSelectedItems([])
+                                        setIsManageMode(!isManageMode)
+                                    }}
+                                    borderRadius={"md"}
+                                    disabled={artworks.length == 0}
+                                >
+                                    <Show
+                                        when={!isManageMode}
+                                        fallback={
+                                            <>
+                                                <MdCancel /> Cancel
+                                            </>
+                                        }
+                                    >
+                                        <ImCogs /> Manage
+                                    </Show>
+                                </Button>
+                                <Button
+                                    size="sm"
+                                    bg={colorMode === "light" ? "teal.400" : "pink.600"}
+                                    color={"white"}
+                                    shadow={"md"}
+                                    onClick={onNewArt}
+                                    borderRadius={"md"}
+                                >
+                                    <FaPaintBrush /> New ArtWork
+                                </Button>
+                            </HStack>
+                        </Show>
+                    </Flex>
+                    <Show
+                        when={isOwnProfile && isManageMode}
+                    >
+                        <HStack width="full" alignItems={"center"}>                            
                             <Button
                                 size="sm"
                                 bg={colorMode === "light" ? "teal.400" : "pink.600"}
                                 color={"white"}
                                 shadow={"md"}
-                                onClick={onNewArt}
+                                onClick={() => setIsModalOpen(true)}
+                                disabled={selectedItems.length == 0}
                                 borderRadius={"md"}
                             >
-                                <FaPaintBrush /> New ArtWork
+                                <MdCancel /> Delete Selected ArtWorks
                             </Button>
-                        </Show>
-                    </Flex>
+                        </HStack>
+                    </Show>
                     <Box
                         bg={colorMode === 'light' ? "whiteAlpha.950" : "blackAlpha.500"}
                         rounded={"lg"}
@@ -67,13 +147,16 @@ const ArtistContent = ({
                             >
                                 <For each={artworks}>
                                     {(artwork) => (
-                                        <ArtworkItem 
+                                        <ArtworkItem
                                             key={artwork.artworkId}
                                             artwork={artwork}
                                             isOpen={openMenuId === artwork.artworkId}
                                             onMenuToggle={onMenuOpen}
                                             isOwnProfile={isOwnProfile}
-                                            onDelete={onDelete}
+                                            isManageMode={isManageMode}
+                                            onSelectItem={handleSelectItem}
+                                            isSelected={isItemSelected(artwork)}
+                                            setOpenModal={setIsModalOpen}
                                         />
                                     )}
                                 </For>
@@ -82,6 +165,15 @@ const ArtistContent = ({
                     </Box>
                 </Stack>
             </GridItem>
+
+            <WarningDialog
+                isOpen={isModalOpen}
+                title={"Delete ArtWork"}
+                message={`Are you sure you want to delete this ArtWorks?`}
+                items={selectedItems}
+                onClose={handleCloseDelete}
+                onComplete={handleConfirmDelete}
+            />
         </>
     );
 }

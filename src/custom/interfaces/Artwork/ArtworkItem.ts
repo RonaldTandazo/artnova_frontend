@@ -5,5 +5,8 @@ export interface ArtworkItemProps {
     isOpen: boolean;
     onMenuToggle: (artworkId: number | undefined) => void;
     isOwnProfile: boolean | undefined;
-    onDelete: (artworkId: number[]) => void;
+    isManageMode: boolean;
+    isSelected: boolean;
+    onSelectItem: (artwork: Artwork) => void;
+    setOpenModal: (isOpen: boolean) => void;
 }

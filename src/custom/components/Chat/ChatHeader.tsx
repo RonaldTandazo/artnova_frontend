@@ -11,7 +11,7 @@ import { useDeleteChat } from "@/services/Chat/ChatService"
 import { useSetBlockState, useUnsetBlockState } from "@/services/Block/BlockService"
 import WarningDialog from "../Dialogs/WarningDialog"
 import { useState } from "react"
-import { DeleteItem } from "@/custom/interfaces/Dialogs/WarningDialog"
+import { SelectedItem } from "@/custom/interfaces/Dialogs/WarningDialog"
 
 const ChatHeader = ({selectedChat, user, setChats, setSelectedChat, onShowMessage}: ChatHeaderInterface) => {
     const { colorMode } = useColorMode();
@@ -21,7 +21,7 @@ const ChatHeader = ({selectedChat, user, setChats, setSelectedChat, onShowMessag
     const { unsetBlockState } = useUnsetBlockState();
     const { deleteChat } = useDeleteChat();
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-    const [deleteItems, setDeleteItems] = useState<DeleteItem[]>([]);
+    const [deleteItems, setDeleteItems] = useState<SelectedItem[]>([]);
     const [data, setData] = useState<{title: string, message: string, complete: () => void} | undefined>(undefined);
 
     const handleNavigateProfile = (userId: number) => {
