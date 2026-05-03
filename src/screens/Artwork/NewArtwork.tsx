@@ -325,6 +325,7 @@ const NewArtwork = () => {
 
     const handle3DModelUpdate = (file: ModelFileInterface) => {
         setModelFile(file)
+        setConfig(FACTORY_SETTINGS);
     }
 
     const handleRemoveModel = () => {
