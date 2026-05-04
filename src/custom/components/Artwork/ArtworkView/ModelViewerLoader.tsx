@@ -54,15 +54,12 @@ const ModelViewerLoader = ({
     };
 
     const handleAR = () => {
-        if (isAndroid) {
-            if(modelFile){
-                const testModel = "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/DamagedHelmet/glTF-Binary/DamagedHelmet.glb";
-                const encodedFile = encodeURIComponent(testModel);
+        if (modelFile && isAndroid) {
+            const encodedFile = encodeURIComponent(modelFile);
 
-                const sceneViewerUrl = `intent://arvr.google.com/scene-viewer/1.0?file=${encodedFile}&mode=ar_only#Intent;scheme=https;action=android.intent.action.VIEW;end;`;
-                
-                window.location.href = sceneViewerUrl;
-            }
+            const sceneViewerUrl = `intent://arvr.google.com/scene-viewer/1.0?file=${encodedFile}&mode=ar_only#Intent;scheme=https;action=android.intent.action.VIEW;end;`;
+            
+            window.location.href = sceneViewerUrl;
         } else if(isIOS){
             alert("AR sooooon!");
         } else {
