@@ -35,7 +35,10 @@ const ModelViewerLoader = ({
         }
 
     }, [artworkModelData])
-    
+
+    const isAndroid = /Android/i.test(navigator.userAgent);
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
     const handleLoadModel = async () => {
         if (artworkId) {
             setIsLoadingModel(true);
@@ -51,12 +54,11 @@ const ModelViewerLoader = ({
     };
 
     const handleAR = () => {
-        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-        if (isMobile) {
+        if (isAndroid) {
             const sceneViewerUrl = `intent://arvr.google.com/scene-viewer/1.0?file=${modelFile}&mode=ar_only#Intent;scheme=https;package=com.google.android.googleview;action=android.intent.action.VIEW;S.browser_fallback_url=https://developers.google.com/ar;end;`;
-            
             window.location.href = sceneViewerUrl;
+        } else if(isIOS){
+            alert("AR sooooon!");
         } else {
             setIsModalOpen(true)
         }
@@ -86,20 +88,24 @@ const ModelViewerLoader = ({
                             initialConfig={initialConfig}
                             setConfig={setConfig}
                         />
-                        
-                        <IconButton
-                            aria-label="View in AR"
-                            position="absolute"
-                            bottom={4}
-                            right={16}
-                            size="sm"
-                            variant="ghost"
-                            color="whiteAlpha.600"
-                            _hover={{ color: (colorMode === 'light' ? 'teal.400':'pink.600') }}
-                            onClick={handleAR}
+
+                        <Show
+                            when={!isIOS}
                         >
-                            <FaMobileAlt />
-                        </IconButton>
+                            <IconButton
+                                aria-label="View in AR"
+                                position="absolute"
+                                bottom={4}
+                                right={16}
+                                size="sm"
+                                variant="ghost"
+                                color="whiteAlpha.600"
+                                _hover={{ color: (colorMode === 'light' ? 'teal.400':'pink.600') }}
+                                onClick={handleAR}
+                            >
+                                <FaMobileAlt />
+                            </IconButton>
+                        </Show>                        
 
                         <IconButton
                             aria-label="Exit 3D"
