@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Box, Flex, Image, Text, Spinner, IconButton, Icon, Show } from '@chakra-ui/react';
-import { FaPlay, FaCube } from 'react-icons/fa';
+import { FaPlay, FaCube, FaMobileAlt } from 'react-icons/fa';
 import { BACKEND_URL, FACTORY_SETTINGS } from '@/utils/Helpers';
 import { useColorMode } from '@/components/ui/color-mode';
 import { ModelViewerLoaderProps } from '@/custom/interfaces/ArtworkView/ModelViewerLoader';
 import { useGetArtworkModel } from '@/services/Artwork/ArtworkService';
 import { SceneConfig } from '@/custom/interfaces/3DFile/Upload3DFile';
 import StoredModelViewer from './StoredModelViewer';
+import QRDialog from '../../Dialogs/QRDialog';
 
 const ModelViewerLoader = ({ 
     artworkId,
@@ -19,6 +20,8 @@ const ModelViewerLoader = ({
     const [resources, setResources] = useState<string[] | undefined>(undefined);
     const [config, setConfig] = useState<SceneConfig>(FACTORY_SETTINGS);
     const [initialConfig, setInitialConfig] = useState<SceneConfig>(FACTORY_SETTINGS);
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
     const { getArtworkModel: GetArtworkModel, data: artworkModelData } = useGetArtworkModel();
 
     useEffect(() => {
@@ -47,6 +50,20 @@ const ModelViewerLoader = ({
         }
     };
 
+    const handleAR = () => {
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+        if (isMobile) {
+            const sceneViewerUrl = `intent://arvr.google.com/scene-viewer/1.0?file=${modelFile}&mode=ar_only#Intent;scheme=https;package=com.google.android.googleview;action=android.intent.action.VIEW;S.browser_fallback_url=https://developers.google.com/ar;end;`;
+            
+            window.location.href = sceneViewerUrl;
+        } else {
+            setIsModalOpen(true)
+        }
+    };
+
+    const handleCloseModal = () => setIsModalOpen(false);
+
     return (
         <Box
             position="relative"
@@ -71,6 +88,20 @@ const ModelViewerLoader = ({
                         />
                         
                         <IconButton
+                            aria-label="View in AR"
+                            position="absolute"
+                            bottom={4}
+                            right={16}
+                            size="sm"
+                            variant="ghost"
+                            color="whiteAlpha.600"
+                            _hover={{ color: (colorMode === 'light' ? 'teal.400':'pink.600') }}
+                            onClick={handleAR}
+                        >
+                            <FaMobileAlt />
+                        </IconButton>
+
+                        <IconButton
                             aria-label="Exit 3D"
                             position="absolute"
                             bottom={4}
@@ -78,8 +109,11 @@ const ModelViewerLoader = ({
                             size="sm"
                             variant="ghost"
                             color="whiteAlpha.600"
-                            _hover={{ color: "brand.magenta" }}
-                            onClick={() => setIsModelLoaded(false)}
+                            _hover={{ color: (colorMode === 'light' ? 'teal.400':'pink.600') }}
+                            onClick={() => {
+                                setIsModelLoaded(false)
+                                setConfig(initialConfig)
+                            }}
                         >
                             <FaCube/>
                         </IconButton>
@@ -161,6 +195,11 @@ const ModelViewerLoader = ({
                     </Flex>
                 </Flex>
             </Show>
+
+            <QRDialog
+                isOpen={isModalOpen}
+                onClose={handleCloseModal}
+            />
         </Box>
     );
 };
