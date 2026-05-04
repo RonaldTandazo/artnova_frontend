@@ -56,7 +56,8 @@ const ModelViewerLoader = ({
     const handleAR = () => {
         if (isAndroid) {
             if(modelFile){
-                const sceneViewerUrl = `https://arvr.google.com/scene-viewer/1.0?file=${modelFile}&mode=ar_only`;
+                const testModel = "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/DamagedHelmet/glTF-Binary/DamagedHelmet.glb";
+                const sceneViewerUrl = `https://arvr.google.com/scene-viewer/1.0?file=${testModel}`;
 
                 window.location.href = sceneViewerUrl;
             }
