@@ -55,8 +55,12 @@ const ModelViewerLoader = ({
 
     const handleAR = () => {
         if (isAndroid) {
-            const sceneViewerUrl = `intent://arvr.google.com/scene-viewer/1.0?file=${modelFile}&mode=ar_only#Intent;scheme=https;package=com.google.android.googleview;action=android.intent.action.VIEW;S.browser_fallback_url=https://developers.google.com/ar;end;`;
-            window.location.href = sceneViewerUrl;
+            if(modelFile){
+                const encodedFile = encodeURIComponent(modelFile);
+                const sceneViewerUrl = `intent://arvr.google.com/scene-viewer/1.0?file=${encodedFile}&mode=ar_only#Intent;scheme=https;package=com.google.android.googleview;action=android.intent.action.VIEW;S.browser_fallback_url=https://developers.google.com/ar;end;`;
+                
+                window.location.href = sceneViewerUrl;
+            }
         } else if(isIOS){
             alert("AR sooooon!");
         } else {
