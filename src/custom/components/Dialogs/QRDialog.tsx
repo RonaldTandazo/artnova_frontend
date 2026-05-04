@@ -62,6 +62,15 @@ const QRDialog = ({
                                 >
                                     Scan this code with your mobile camera to project the 3D model in your space
                                 </Text>
+
+                                <Text
+                                    fontSize={"sm"}
+                                    fontWeight={"bold"}
+                                    whiteSpace="pre-line"
+                                    color={colorMode === 'light' ? 'blackAlpha.950':'whiteAlpha.950'}
+                                >
+                                    iOS Devices AR feature is not available
+                                </Text>
                             </VStack>
                         </Dialog.Body>
                         <Dialog.Footer>
