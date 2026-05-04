@@ -57,8 +57,10 @@ const ModelViewerLoader = ({
         if (isAndroid) {
             if(modelFile){
                 const testModel = "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/DamagedHelmet/glTF-Binary/DamagedHelmet.glb";
-                const sceneViewerUrl = `https://arvr.google.com/scene-viewer/1.0?file=${testModel}`;
+                const encodedFile = encodeURIComponent(testModel);
 
+                const sceneViewerUrl = `intent://arvr.google.com/scene-viewer/1.0?file=${encodedFile}&mode=ar_only#Intent;scheme=https;action=android.intent.action.VIEW;end;`;
+                
                 window.location.href = sceneViewerUrl;
             }
         } else if(isIOS){
